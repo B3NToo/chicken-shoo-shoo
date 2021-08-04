@@ -52,6 +52,8 @@ bool Utils::rectangleCollidesWithRectangle(Drawable *rect1, Drawable *rect2) {
 }
 
 bool Utils::rayCollidesWithRectangle(const sf::Vector2f &rayOrigin, const sf::Vector2f &rayDir, const Drawable *rect, sf::Vector2f &collisionPoint, sf::Vector2f &normal, float &tCollision) {
+    //
+
     // if the ray collides with the rectangle, the collision point can be expressed as P(t) = rayOrigin + rayDir * t
     // now we just need to find t
 
@@ -75,16 +77,16 @@ bool Utils::rayCollidesWithRectangle(const sf::Vector2f &rayOrigin, const sf::Ve
     }
 
     // if the ray collides collides with the rectangle's borders, and not just their extansions, then tCloserX < tFurtherY && tCloserY < tFurtherX, else they do not collide
-    if (tCloserX > tFurtherY && tCloserY > tFurtherX) {
+    if (tCloserX > tFurtherY || tCloserY > tFurtherX) {
         return false;
     }
 
     // between P(tCloserX) and P(tCloserY), the closer one is the one where our ray intersects with just the extension of the border
     // the one further away is the one where it actually intersects with the rectangle's border, aka our entry point
-    float tEntry = (tCloserX > tCloserY ? tCloserX : tCloserY);
+    tCollision = (tCloserX > tCloserY ? tCloserX : tCloserY);
 
     // if the entry point is in the opposite direction of where our rayDir is pointing, the ray doesn't intersect with the rectangle
-    if (tEntry < 0.0) {
+    if (tCollision < 0.0) {
         return false;
     }
 
@@ -114,5 +116,46 @@ bool Utils::rayCollidesWithRectangle(const sf::Vector2f &rayOrigin, const sf::Ve
     // a collision has occured!
     return true;
 }
+
+float Utils::vecToRad(const sf::Vector2f vec) {
+    // theta =  tan1^(-1)(opposite side / adjacent side)
+    return atan2(vec.y, vec.x);
+}
+
+float Utils::vecToDeg(const sf::Vector2f vec) {
+    float rad = Utils::vecToRad(vec);
+    return Utils::radToDeg(rad);
+}
+
+float Utils::radToDeg(const float rad) {
+    return rad * 180 / M_PI;
+}
+
+sf::RectangleShape Utils::makeLine(const sf::Vector2f start, const sf::Vector2f end, sf::Color color) {
+    // sfml doesn't have a draw line function, so we will just draw a slim rectangle from the start to the end
+    sf::Vector2f vec = end - start;
+
+    // rectangle starts at our starting point, has the length of the vector between end and start
+    float vecLength = std::hypotf(vec.x, vec.y);
+    sf::RectangleShape rect(sf::Vector2f(vecLength, 2.0));
+    rect.setPosition(start);
+
+    // rectangle needs to be rotated
+    float angle = Utils::vecToDeg(vec);
+    rect.rotate(angle);
+
+    // finally, set the the rectangle's color
+    rect.setFillColor(color);
+
+    return rect;
+}
+
+sf::RectangleShape Utils::makeLine(const sf::Vector2f start, const sf::Vector2f end) {
+    // returns a red line
+    return Utils::makeLine(start, end, sf::Color::Red);
+}
+
+
+
 
 

@@ -2,6 +2,8 @@
 #define UTILS_H
 #include <SFML/Graphics.hpp>
 #include "drawable.h"
+#include <math.h>
+#include <iostream>
 
 class Utils
 {
@@ -16,6 +18,11 @@ public:
     static bool rectangleCollidesWithRectangle(Drawable* rect1, Drawable* rect2);
     static bool rayCollidesWithRectangle(const sf::Vector2f& rayOrigin, const sf::Vector2f& rayDir, const Drawable* rect,
                                          sf::Vector2f& collisionPoint, sf::Vector2f& normal, float& tCollision);
+    static float vecToRad(const sf::Vector2f vec);
+    static float vecToDeg(const sf::Vector2f vec);
+    static float radToDeg(const float rad);
+    static sf::RectangleShape makeLine(const sf::Vector2f start, const sf::Vector2f end);
+    static sf::RectangleShape makeLine(const sf::Vector2f start, const sf::Vector2f end, sf::Color color);
 
 public:
     static const int TILE_WIDTH = 64; // the width of a level tile in pixel-space

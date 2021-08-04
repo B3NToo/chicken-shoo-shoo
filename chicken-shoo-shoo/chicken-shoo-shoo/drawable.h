@@ -13,6 +13,7 @@ public:
 
     sf::Vector2f getPos() const;
     void setPos(const sf::Vector2f &value);
+    void setPos(float x, float y);
 
     sf::Vector2f getSize() const;
     void setSize(const sf::Vector2f &value);
