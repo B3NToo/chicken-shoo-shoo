@@ -29,8 +29,6 @@ LIBS += -L$$PWD/SFML/bin/ -lsfml-system-2
 INCLUDEPATH += $$PWD/SFML/include
 DEPENDPATH += $$PWD/SFML/lib
 
-
-
 LIBS += -L$$PWD/SFML/bin/ -lsfml-graphics-2
 
 LIBS += -L$$PWD/SFML/bin/ -lsfml-window-2
