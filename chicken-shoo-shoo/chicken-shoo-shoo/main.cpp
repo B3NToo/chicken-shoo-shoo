@@ -3,17 +3,11 @@
 #include <iostream>
 #include "utils.h"
 
-<<<<<<< Updated upstream
-
-
-
-// Change
-=======
 /* TODO:
  *
  * insert tile class into game draw fu
  */
->>>>>>> Stashed changes
+
 
 int main() {
     // create the window we will draw to
