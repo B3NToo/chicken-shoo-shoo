@@ -132,7 +132,7 @@ float Utils::radToDeg(const float rad) {
 }
 
 sf::RectangleShape Utils::makeLine(const sf::Vector2f start, const sf::Vector2f end, sf::Color color) {
-    // sfml doesn't have a draw line function, so we will just draw a slim rectangle from the start to the end
+    // sfml doesn't have a draw line function, so we will just draw a slim rectangle from one point to the other
     sf::Vector2f vec = end - start;
 
     // rectangle starts at our starting point, has the length of the vector between end and start
