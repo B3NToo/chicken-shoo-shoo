@@ -17,6 +17,7 @@ SOURCES += \
         level.cpp \
         levelloader.cpp \
         main.cpp \
+        tile.cpp \
         utils.cpp
 
 # Default rules for deployment.
@@ -210,4 +211,5 @@ HEADERS += \
   inputhandler.h \
   level.h \
   levelloader.h \
+  tile.h \
   utils.h

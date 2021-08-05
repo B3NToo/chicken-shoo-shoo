@@ -31,6 +31,16 @@ void Drawable::setSize(const sf::Vector2f &value)
     size = value;
 }
 
+sf::Vector2f Drawable::getVel() const
+{
+    return vel;
+}
+
+void Drawable::setVel(const sf::Vector2f &value)
+{
+    vel = value;
+}
+
 void Drawable::setPos(float x, float y) {
     this->pos = sf::Vector2f(x, y);
 }

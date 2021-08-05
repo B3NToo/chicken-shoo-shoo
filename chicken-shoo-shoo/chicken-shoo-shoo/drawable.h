@@ -18,9 +18,13 @@ public:
     sf::Vector2f getSize() const;
     void setSize(const sf::Vector2f &value);
 
+    sf::Vector2f getVel() const;
+    void setVel(const sf::Vector2f &value);
+
 protected:
     sf::Vector2f pos;
     sf::Vector2f size;
+    sf::Vector2f vel;
 };
 
 #endif // DRAWABLE_H

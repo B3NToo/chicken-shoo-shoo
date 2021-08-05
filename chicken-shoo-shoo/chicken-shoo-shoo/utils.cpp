@@ -156,6 +156,10 @@ sf::RectangleShape Utils::makeLine(const sf::Vector2f start, const sf::Vector2f 
 }
 
 bool Utils::movingRectangleCollidesWithRectangle(const Drawable* movingRect, const sf::Vector2f &rayDir, const Drawable* targetRect, sf::Vector2f &collisionPoint, sf::Vector2f &normal, float &tCollision) {
+    if (movingRect->getVel().x == 0 && movingRect->getVel().y) {
+        return false;
+    }
+
 
 }
 
