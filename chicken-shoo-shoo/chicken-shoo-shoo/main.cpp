@@ -3,6 +3,11 @@
 #include <iostream>
 #include "utils.h"
 
+
+
+
+// Change
+
 int main() {
     // create the window we will draw to
     sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode(800, 600), "SFML works!");
@@ -12,7 +17,7 @@ int main() {
     Avatar a;
     a.setPos(2.0, 2.0);
     sf::Vector2f origin(5.0, 5.0);
-    sf::Vector2 mousePos(0,0);
+    sf::Vector2i mousePos(0,0);
     sf::Vector2f ray;
 
     while (window->isOpen()) {
