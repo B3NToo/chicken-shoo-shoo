@@ -30,15 +30,6 @@ int main() {
             case sf::Event::Closed:
                 window->close();
                 break;
-
-                // key pressed
-            case (sf::Event::KeyPressed):
-                break;
-
-            case (sf::Event::KeyReleased):
-
-                break;
-
                 // we don't process other types of events yet
             default:
                 break;
