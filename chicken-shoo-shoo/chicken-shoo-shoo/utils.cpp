@@ -136,7 +136,7 @@ sf::RectangleShape Utils::makeLine(const sf::Vector2f start, const sf::Vector2f 
     sf::Vector2f vec = end - start;
 
     // rectangle starts at our starting point, has the length of the vector between end and start
-    float vecLength = std::hypotf(vec.x, vec.y);
+    float vecLength = sqrt(vec.x * vec.x + vec.y * vec.y);
     sf::RectangleShape rect(sf::Vector2f(vecLength, 2.0));
     rect.setPosition(start);
 

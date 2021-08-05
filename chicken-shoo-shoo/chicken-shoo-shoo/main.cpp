@@ -12,7 +12,7 @@ int main() {
     Avatar a;
     a.setPos(2.0, 2.0);
     sf::Vector2f origin(5.0, 5.0);
-    sf::Vector2 mousePos(0,0);
+    sf::Vector2i mousePos(0,0);
     sf::Vector2f ray;
 
     while (window->isOpen()) {

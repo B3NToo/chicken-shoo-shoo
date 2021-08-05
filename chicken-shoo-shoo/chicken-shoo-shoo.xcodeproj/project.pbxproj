@@ -13,6 +13,15 @@
 		2B48318026BAC6C300374B9A /* nice_music.ogg in Resources */ = {isa = PBXBuildFile; fileRef = 2B48317F26BAC6C300374B9A /* nice_music.ogg */; };
 		2B48318226BAC6C300374B9A /* sansation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2B48318126BAC6C300374B9A /* sansation.ttf */; };
 		2B48318426BAC6C300374B9A /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 2B48318326BAC6C300374B9A /* icon.png */; };
+		2B81A41F26BC0474007143CA /* avatar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2B81A41526BC0474007143CA /* avatar.cpp */; };
+		2B81A42026BC0474007143CA /* level.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2B81A41626BC0474007143CA /* level.cpp */; };
+		2B81A42126BC0474007143CA /* levelloader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2B81A41726BC0474007143CA /* levelloader.cpp */; };
+		2B81A42226BC0474007143CA /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2B81A41926BC0474007143CA /* utils.cpp */; };
+		2B81A42326BC0474007143CA /* chicken.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2B81A41A26BC0474007143CA /* chicken.cpp */; };
+		2B81A42426BC0474007143CA /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2B81A41B26BC0474007143CA /* camera.cpp */; };
+		2B81A42526BC0474007143CA /* game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2B81A41C26BC0474007143CA /* game.cpp */; };
+		2B81A42626BC0474007143CA /* drawable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2B81A41D26BC0474007143CA /* drawable.cpp */; };
+		2B81A42726BC0474007143CA /* inputhandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2B81A41E26BC0474007143CA /* inputhandler.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +34,16 @@
 		2B48317F26BAC6C300374B9A /* nice_music.ogg */ = {isa = PBXFileReference; lastKnownFileType = file; name = nice_music.ogg; path = ../nice_music.ogg; sourceTree = "<group>"; };
 		2B48318126BAC6C300374B9A /* sansation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = sansation.ttf; path = ../sansation.ttf; sourceTree = "<group>"; };
 		2B48318326BAC6C300374B9A /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = ../icon.png; sourceTree = "<group>"; };
+		2B81A41526BC0474007143CA /* avatar.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = avatar.cpp; path = "chicken-shoo-shoo/avatar.cpp"; sourceTree = "<group>"; };
+		2B81A41626BC0474007143CA /* level.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = level.cpp; path = "chicken-shoo-shoo/level.cpp"; sourceTree = "<group>"; };
+		2B81A41726BC0474007143CA /* levelloader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = levelloader.cpp; path = "chicken-shoo-shoo/levelloader.cpp"; sourceTree = "<group>"; };
+		2B81A41826BC0474007143CA /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = "chicken-shoo-shoo/main.cpp"; sourceTree = "<group>"; };
+		2B81A41926BC0474007143CA /* utils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = utils.cpp; path = "chicken-shoo-shoo/utils.cpp"; sourceTree = "<group>"; };
+		2B81A41A26BC0474007143CA /* chicken.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = chicken.cpp; path = "chicken-shoo-shoo/chicken.cpp"; sourceTree = "<group>"; };
+		2B81A41B26BC0474007143CA /* camera.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = camera.cpp; path = "chicken-shoo-shoo/camera.cpp"; sourceTree = "<group>"; };
+		2B81A41C26BC0474007143CA /* game.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = game.cpp; path = "chicken-shoo-shoo/game.cpp"; sourceTree = "<group>"; };
+		2B81A41D26BC0474007143CA /* drawable.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = drawable.cpp; path = "chicken-shoo-shoo/drawable.cpp"; sourceTree = "<group>"; };
+		2B81A41E26BC0474007143CA /* inputhandler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = inputhandler.cpp; path = "chicken-shoo-shoo/inputhandler.cpp"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +60,16 @@
 		2B48316826BAC6C300374B9A = {
 			isa = PBXGroup;
 			children = (
+				2B81A41526BC0474007143CA /* avatar.cpp */,
+				2B81A41B26BC0474007143CA /* camera.cpp */,
+				2B81A41A26BC0474007143CA /* chicken.cpp */,
+				2B81A41D26BC0474007143CA /* drawable.cpp */,
+				2B81A41C26BC0474007143CA /* game.cpp */,
+				2B81A41E26BC0474007143CA /* inputhandler.cpp */,
+				2B81A41626BC0474007143CA /* level.cpp */,
+				2B81A41726BC0474007143CA /* levelloader.cpp */,
+				2B81A41826BC0474007143CA /* main.cpp */,
+				2B81A41926BC0474007143CA /* utils.cpp */,
 				2B48317426BAC6C300374B9A /* chicken-shoo-shoo */,
 				2B48317326BAC6C300374B9A /* Products */,
 			);
@@ -177,7 +206,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2B81A41F26BC0474007143CA /* avatar.cpp in Sources */,
+				2B81A42026BC0474007143CA /* level.cpp in Sources */,
+				2B81A42126BC0474007143CA /* levelloader.cpp in Sources */,
 				2B48317B26BAC6C300374B9A /* main.cpp in Sources */,
+				2B81A42226BC0474007143CA /* utils.cpp in Sources */,
+				2B81A42326BC0474007143CA /* chicken.cpp in Sources */,
+				2B81A42426BC0474007143CA /* camera.cpp in Sources */,
+				2B81A42526BC0474007143CA /* game.cpp in Sources */,
+				2B81A42626BC0474007143CA /* drawable.cpp in Sources */,
+				2B81A42726BC0474007143CA /* inputhandler.cpp in Sources */,
 				2B48317826BAC6C300374B9A /* ResourcePath.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

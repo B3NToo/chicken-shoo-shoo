@@ -46,9 +46,8 @@ void Game::draw() {
 
     // in order to draw the tiles in the right position, we need to offset them by topLeft's decimal amount
     sf::Vector2f decimalOffset;
-    float intpart; // we don't actually use this, this is just for modf to work
-    decimalOffset.x = std::modf(topLeft.x, &intpart);
-    decimalOffset.y = std::modf(topLeft.y, &intpart);
+    decimalOffset.x = topLeft.x - floor(topLeft.x);
+    decimalOffset.y = topLeft.y- floor(topLeft.y);
 
     // draw all tiles that are inside the frame
     for(int i = 0; i < this->visibleTilesX + 2; i++) { // +2 to make sure there are no tiles missing around the edges
