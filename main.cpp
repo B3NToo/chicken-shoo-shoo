@@ -7,7 +7,7 @@
 /* TODO:
  * - tile class
  * - insert tile class into game draw function
- * -
+ * - implement elapsed time
  */
 
 int main() {
@@ -20,11 +20,14 @@ int main() {
     a.setPos(2.0, 2.0);
     sf::Vector2f origin(5.0, 5.0);
     sf::Vector2i mousePos(0,0);
-    sf::Vector2f ray;
-//    sf::RectangleShape *rs = new sf::RectangleShape(sf::Vector2f(0,0));
-//    Rectangle r(sf::Vector2f(4.0,4.0), sf::Vector2f(3.0,6.0), rs);
-//    r.getShape()->setSize(Utils::tileSpaceToPixelSpace(r.getSize()));
-//    r.getShape()->setFillColor(sf::Color::Green);
+
+    sf::RectangleShape *rs = new sf::RectangleShape(sf::Vector2f(0,0));
+    Rectangle r(sf::Vector2f(4.0,4.0), sf::Vector2f(3.0,6.0), rs);
+    r.getShape()->setPosition(Utils::tileSpaceToPixelSpace(r.getPos()));
+    r.getShape()->setSize(Utils::tileSpaceToPixelSpace(r.getSize()));
+    r.getShape()->setFillColor(sf::Color::Green);
+
+
 
     while (window->isOpen()) {
         window->clear();
@@ -47,29 +50,29 @@ int main() {
             }
         }
 
+        sf::Vector2f mouseDir(Utils::pixelSpaceToTileSpaceX(mousePos.x) - a.getPos().x,Utils::pixelSpaceToTileSpaceY(mousePos.y) - a.getPos().y);
+        mouseDir = Utils::normalizeVector(mouseDir);
+        Utils::scaleVector(mouseDir, 0.01);
+        a.setVel(mouseDir);
+
+
         a.getShape()->setPosition(Utils::tileSpaceToPixelSpace(a.getPos()));
         window->draw(*a.getShape());
 
-        sf::Vector2f dir =  Utils::pixelSpaceToTileSpace(sf::Vector2f(mousePos.x, mousePos.y));
-        dir -= origin;
         sf::Vector2f colP;
         sf::Vector2f normal;
         float tCol;
 
-//        window->draw(*(r.getShape()));
+        window->draw(*(r.getShape()));
 
-        bool collides = Utils::rayCollidesWithRectangle(origin, dir, &a, colP, normal, tCol) && tCol < 1.0;
+        bool collides = Utils::movingRectangleCollidesWithRectangle(&a, &r, colP, normal, tCol) && tCol < 1.0;
 
         if(collides) {
-            window->draw(Utils::makeLine(Utils::tileSpaceToPixelSpace(origin), sf::Vector2f(mousePos.x, mousePos.y)));
-            sf::CircleShape debugCircle(3.0);
-            debugCircle.setFillColor(sf::Color::Green);
-            debugCircle.setPosition(Utils::tileSpaceToPixelSpace(colP));
-            window->draw(debugCircle);
-        } else {
-            window->draw(Utils::makeLine(Utils::tileSpaceToPixelSpace(origin), sf::Vector2f(mousePos.x, mousePos.y), sf::Color::Blue));
+            mouseDir.x += normal.x * std::abs(mouseDir.x) * (1 - tCol);
+            mouseDir.y += normal.y * std::abs(mouseDir.y) * (1 - tCol);
         }
 
+        a.update(mouseDir);
 
 
 //        game.readInputs();

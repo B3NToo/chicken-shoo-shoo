@@ -11,17 +11,11 @@ public:
     ~Avatar();
     void update(sf::Vector2f inputVel);
 
-
-
-    sf::Vector2f getVel() const;
-    void setVel(const sf::Vector2f &value);
-
     virtual sf::RectangleShape *getShape() const override;
     void setShape(sf::RectangleShape *value);
 
 private:
     sf::RectangleShape* shape;
-    sf::Vector2f vel;
 };
 
 

@@ -66,7 +66,7 @@ bool Utils::rayCollidesWithRectangle(const sf::Vector2f &rayOrigin, const sf::Ve
     float tCloserX = (rect->getPos().x - rayOrigin.x) / rayDir.x;
     float tCloserY = (rect->getPos().y - rayOrigin.y) / rayDir.y;
     float tFurtherX = (rect->getPos().x + rect->getSize().x - rayOrigin.x) / rayDir.x;
-    float tFurtherY = (rect->getPos().y + rect->getSize().x - rayOrigin.y) / rayDir.y;
+    float tFurtherY = (rect->getPos().y + rect->getSize().y - rayOrigin.y) / rayDir.y;
 
     // make sure tCloser is actually closer than tFurther:
     if (tCloserX > tFurtherX) {
@@ -155,16 +155,15 @@ sf::RectangleShape Utils::makeLine(const sf::Vector2f start, const sf::Vector2f 
     return Utils::makeLine(start, end, sf::Color::Red);
 }
 
-bool Utils::movingRectangleCollidesWithRectangle(const Drawable* dynamicRect, const sf::Vector2f &rayDir, const Drawable* targetRect, sf::Vector2f &collisionPoint, sf::Vector2f &normal, float &tCollision) {
+bool Utils::movingRectangleCollidesWithRectangle(const Drawable* dynamicRect, const Drawable* targetRect, sf::Vector2f &collisionPoint, sf::Vector2f &normal, float &tCollision) {
     // if our dynamic rectangle is not moving, it can't collide with a static rectangle
     if(dynamicRect->getVel().x == 0 && dynamicRect->getVel().y == 0) {
         return false;
     }
-
     // create a rectangle around the target rectangle, whose borders will be bigger by half the dynamic rectangle's size
     // this way, we can just check if the dynamic rectangle's center collides with the new rectangle, instead of checking the four corners
     sf::Vector2f colRectPos(sf::Vector2f(targetRect->getPos().x - dynamicRect->getSize().x * 0.5, targetRect->getPos().y - dynamicRect->getSize().y * 0.5));
-    sf::Vector2f colRectSize(sf::Vector2f(dynamicRect->getSize().x + targetRect->getSize().x, dynamicRect->getSize().y + targetRect->getSize().y));
+    sf::Vector2f colRectSize(sf::Vector2f(targetRect->getSize().x + dynamicRect->getSize().x, targetRect->getSize().y + dynamicRect->getSize().y));
     sf::RectangleShape rs;
     Rectangle r(colRectPos, colRectSize, &rs);
 
@@ -182,6 +181,20 @@ bool Utils::movingRectangleCollidesWithRectangle(const Drawable* dynamicRect, co
     return false;
 }
 
+sf::Vector2f Utils::normalizeVector(const sf::Vector2f vec) {
+        float length = sqrt((vec.x * vec.x) + (vec.y * vec.y));
+        if (length != 0) {
+            return sf::Vector2f(vec.x / length, vec.y / length);
+        } else {
+            return vec;
+        }
+}
+
+sf::Vector2f Utils::scaleVector(sf::Vector2f& vec, float scale) {
+    vec.x *= scale;
+    vec.y *= scale;
+    return vec;
+}
 
 
 
