@@ -8,7 +8,7 @@ class Drawable
 public:
     Drawable();
 
-    virtual sf::Shape *getShape() const = 0;
+    virtual sf::RectangleShape *getShape() const = 0;
     virtual bool isVisible() const;
 
     sf::Vector2f getPos() const;

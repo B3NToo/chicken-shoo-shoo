@@ -2,8 +2,7 @@
 
 Avatar::Avatar() : vel(sf::Vector2f(0.0,0.0)) {
     this->pos = sf::Vector2f(0.0,0.0);
-    sf::RectangleShape shape = (sf::RectangleShape(sf::Vector2f(Utils::TILE_WIDTH, Utils::TILE_HEIGHT)));
-    this->shape = &shape;
+    this->shape = new sf::RectangleShape(sf::Vector2f(Utils::TILE_WIDTH, Utils::TILE_HEIGHT));
     this->shape->setFillColor(sf::Color::Magenta);
 }
 
@@ -21,6 +20,10 @@ void Avatar::update(sf::Vector2f inputVel) {
 
     this->pos += this->vel;
     this->shape->setPosition(this->pos);
+}
+
+Avatar::~Avatar() {
+    delete this->shape;
 }
 
 sf::Vector2f Avatar::getVel() const

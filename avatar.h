@@ -8,6 +8,7 @@
 class Avatar : public Drawable {
 public:
     Avatar();
+    ~Avatar();
     void update(sf::Vector2f inputVel);
 
 
