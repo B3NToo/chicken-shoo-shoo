@@ -2,6 +2,7 @@
 #define UTILS_H
 #include <SFML/Graphics.hpp>
 #include "drawable.h"
+#include "rectangle.h"
 #include <math.h>
 #include <iostream>
 
