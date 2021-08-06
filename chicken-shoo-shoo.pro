@@ -17,6 +17,8 @@ SOURCES += \
         level.cpp \
         levelloader.cpp \
         main.cpp \
+        rectangle.cpp \
+        tile.cpp \
         utils.cpp
 
 # Default rules for deployment.
@@ -38,10 +40,13 @@ DEPENDPATH += $$PWD/SFML-2.5.1-macos-clang/include
 HEADERS += \
     ResourcePath.hpp \
     avatar.h \
+    camera.h \
     chicken.h \
     drawable.h \
     game.h \
     inputhandler.h \
     level.h \
     levelloader.h \
+    rectangle.h \
+    tile.h \
     utils.h
