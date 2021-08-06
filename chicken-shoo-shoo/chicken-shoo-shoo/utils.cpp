@@ -155,8 +155,31 @@ sf::RectangleShape Utils::makeLine(const sf::Vector2f start, const sf::Vector2f 
     return Utils::makeLine(start, end, sf::Color::Red);
 }
 
-bool Utils::movingRectangleCollidesWithRectangle(const Drawable* movingRect, const sf::Vector2f &rayDir, const Drawable* targetRect, sf::Vector2f &collisionPoint, sf::Vector2f &normal, float &tCollision) {
+bool Utils::movingRectangleCollidesWithRectangle(const Drawable* dynamicRect, const sf::Vector2f &rayDir, const Drawable* targetRect, sf::Vector2f &collisionPoint, sf::Vector2f &normal, float &tCollision) {
+    // if our dynamic rectangle is not moving, it can't collide with a static rectangle
+    if(dynamicRect->getVel().x == 0 && dynamicRect->getVel().y == 0) {
+        return false;
+    }
 
+    // create a rectangle around the target rectangle, whose borders will be bigger by half the dynamic rectangle's size
+    // this way, we can just check if the dynamic rectangle's center collides with the new rectangle, instead of checking the four corners
+    sf::Vector2f colRectPos(sf::Vector2f(targetRect->getPos().x - dynamicRect->getSize().x * 0.5, targetRect->getPos().y - dynamicRect->getSize().y * 0.5));
+    sf::Vector2f colRectSize(sf::Vector2f(dynamicRect->getSize().x + targetRect->getSize().x, dynamicRect->getSize().y + targetRect->getSize().y));
+    sf::RectangleShape rs;
+    Rectangle r(colRectPos, colRectSize, &rs);
+
+    // set up the variables we use in our ray collision call
+    // the ray's origin will be the center of our dynamic rectangle
+    sf::Vector2f rayOrigin(dynamicRect->getPos().x + dynamicRect->getSize().x * 0.5, dynamicRect->getPos().y + dynamicRect->getSize().y * 0.5);
+
+    // check if the ray collides with the rectangle
+    if(Utils::rayCollidesWithRectangle(rayOrigin, dynamicRect->getVel(), &r, collisionPoint, normal, tCollision)) {
+        if(tCollision < 1.0) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 

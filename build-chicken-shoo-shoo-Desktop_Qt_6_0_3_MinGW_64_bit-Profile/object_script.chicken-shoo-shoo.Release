@@ -7,4 +7,6 @@ release/inputhandler.o
 release/level.o
 release/levelloader.o
 release/main.o
+release/rectangle.o
+release/tile.o
 release/utils.o

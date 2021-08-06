@@ -9,14 +9,17 @@ class Avatar : public Drawable {
 public:
     Avatar();
     void update(sf::Vector2f inputVel);
-    virtual sf::RectangleShape *getShape() override;
-    void setShape(const sf::RectangleShape &value);
+
+
 
     sf::Vector2f getVel() const;
     void setVel(const sf::Vector2f &value);
 
+    virtual sf::RectangleShape *getShape() const override;
+    void setShape(sf::RectangleShape *value);
+
 private:
-    sf::RectangleShape shape;
+    sf::RectangleShape* shape;
     sf::Vector2f vel;
 };
 
