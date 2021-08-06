@@ -1,0 +1,10 @@
+debug/avatar.o
+debug/camera.o
+debug/chicken.o
+debug/drawable.o
+debug/game.o
+debug/inputhandler.o
+debug/level.o
+debug/levelloader.o
+debug/main.o
+debug/utils.o
