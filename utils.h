@@ -19,6 +19,8 @@ public:
     static bool rectangleCollidesWithRectangle(Drawable* rect1, Drawable* rect2);
     static bool rayCollidesWithRectangle(const sf::Vector2f& rayOrigin, const sf::Vector2f& rayDir, const Drawable* rect,
                                          sf::Vector2f& collisionPoint, sf::Vector2f& normal, float& tCollision);
+    static bool movingRectangleCollidesWithRectangle(const Drawable* movingRect, const sf::Vector2f& rayDir, const Drawable* rect,
+                                         sf::Vector2f& collisionPoint, sf::Vector2f& normal, float& tCollision);
     static float vecToRad(const sf::Vector2f vec);
     static float vecToDeg(const sf::Vector2f vec);
     static float radToDeg(const float rad);
