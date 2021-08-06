@@ -21,10 +21,10 @@ int main() {
     sf::Vector2f origin(5.0, 5.0);
     sf::Vector2i mousePos(0,0);
     sf::Vector2f ray;
-    sf::RectangleShape *rs = new sf::RectangleShape(sf::Vector2f(0,0));
-    Rectangle r(sf::Vector2f(4.0,4.0), sf::Vector2f(3.0,6.0), rs);
-    r.getShape()->setSize(Utils::tileSpaceToPixelSpace(r.getSize()));
-    r.getShape()->setFillColor(sf::Color::Green);
+//    sf::RectangleShape *rs = new sf::RectangleShape(sf::Vector2f(0,0));
+//    Rectangle r(sf::Vector2f(4.0,4.0), sf::Vector2f(3.0,6.0), rs);
+//    r.getShape()->setSize(Utils::tileSpaceToPixelSpace(r.getSize()));
+//    r.getShape()->setFillColor(sf::Color::Green);
 
     while (window->isOpen()) {
         window->clear();
@@ -56,7 +56,7 @@ int main() {
         sf::Vector2f normal;
         float tCol;
 
-        window->draw(*(r.getShape()));
+//        window->draw(*(r.getShape()));
 
         bool collides = Utils::rayCollidesWithRectangle(origin, dir, &a, colP, normal, tCol) && tCol < 1.0;
 
@@ -78,7 +78,7 @@ int main() {
         window->display();
     }
 
-    delete rs;
+//    delete rs;
     delete window;
     return 0;
 }

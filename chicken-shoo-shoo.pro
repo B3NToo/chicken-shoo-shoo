@@ -26,16 +26,13 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-#win32:CONFIG(release, debug|release): LIBS +=
+win32: LIBS += -L$$PWD/SFML/bin/ -lsfml-system-2 -lsfml-audio-2 -lsfml-graphics-2 -lsfml-network-2 -lsfml-window-2
+win32: INCLUDEPATH += $$PWD/SFML/include
+win32: DEPENDPATH += $$PWD/SFML/lib
 
-LIBS += -L$$PWD/SFML-2.5.1-macOS-clang/lib/ -lsfml-audio \
-    -lsfml-graphics \
-    -lsfml-network \
-    -lsfml-system \
-    -lsfml-window
-
-INCLUDEPATH += $$PWD/SFML-2.5.1-macos-clang/include
-DEPENDPATH += $$PWD/SFML-2.5.1-macos-clang/include
+unix: LIBS += -L$$PWD/SFML-2.5.1-macOS-clang/lib/ -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window
+unix: INCLUDEPATH += $$PWD/SFML-2.5.1-macos-clang/include
+unix: DEPENDPATH += $$PWD/SFML-2.5.1-macos-clang/include
 
 HEADERS += \
     ResourcePath.hpp \
