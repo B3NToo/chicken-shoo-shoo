@@ -7,6 +7,4 @@ debug/inputhandler.o
 debug/level.o
 debug/levelloader.o
 debug/main.o
-debug/rectangle.o
-debug/tile.o
 debug/utils.o
