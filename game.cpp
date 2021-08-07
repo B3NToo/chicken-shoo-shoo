@@ -5,7 +5,7 @@ Game::Game(sf::RenderWindow *_window) {
     this->window = _window;
     InputHandler (this->inputs);
     std::vector<Drawable*> (this->drawables);
-    Avatar (this->avatar);
+    this->avatar = Avatar();
     LevelLoader (this->loader);
     Camera (this->camera);
 
@@ -18,8 +18,7 @@ Game::Game(sf::RenderWindow *_window) {
     // add everything that will need to be drawn to drawables
     Avatar* aptr = &(this->avatar);
     this->addDrawable(aptr);
-    int i = 0;
-    i++;
+
     this->currentLevel = this->loader.getLevel(0);
 }
 
@@ -77,6 +76,10 @@ void Game::draw() {
             newPos.y -= topLeft.y;
             newPos = Utils::tileSpaceToPixelSpace(newPos);
             (**i).getShape()->setPosition(newPos);
+            std::cout << (**i).getT()->test() << std::endl;
+//            sf::RectangleShape r(sf::Vector2f(200,200));
+//            r.setFillColor(sf::Color::Yellow);
+//            this->window->draw(r);
             this->window->draw(*((**i).getShape()));
         }
     }

@@ -8,6 +8,7 @@ Avatar::Avatar() {
 }
 
 
+
 void Avatar::update(sf::Vector2f inputVel) {
     // this is just for the moment, vel shouldn't be set to 0 every frame
     this->vel.x = 0.0;
@@ -31,4 +32,19 @@ sf::RectangleShape *Avatar::getShape() const
 void Avatar::setShape(sf::RectangleShape *value)
 {
     shape = value;
+}
+
+Avatar::Avatar(const Avatar& other) {
+    this->pos = other.pos;
+    this->shape = new sf::RectangleShape(sf::Vector2f(Utils::TILE_WIDTH, Utils::TILE_HEIGHT));
+    this->shape->setFillColor(sf::Color::Magenta);
+    this->vel = other.vel;
+}
+
+int Avatar::test() {
+    return 10;
+}
+
+testChild *Avatar::getT() const {
+    return this->t;
 }

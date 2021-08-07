@@ -1,6 +1,7 @@
 #ifndef DRAWABLE_H
 #define DRAWABLE_H
 #include <SFML/Graphics.hpp>
+#include "testbase.h"
 
 // interface that makes the class drawable by ensuring it has a drawable shape
 class Drawable
@@ -21,10 +22,16 @@ public:
     sf::Vector2f getVel() const;
     void setVel(const sf::Vector2f &value);
 
+    virtual int test();
+
+    virtual testBase *getT() const;
+    void setT(testBase *value);
+
 protected:
     sf::Vector2f pos;
     sf::Vector2f size;
     sf::Vector2f vel;
+    testBase* t;
 };
 
 #endif // DRAWABLE_H
