@@ -28,6 +28,7 @@ public:
     static sf::RectangleShape makeLine(const sf::Vector2f start, const sf::Vector2f end, sf::Color color);
     static sf::Vector2f normalizeVector(const sf::Vector2f vec);
     static sf::Vector2f scaleVector(sf::Vector2f& vec, float scale);
+    static sf::Vector2f addVectors(const sf::Vector2f& vec1, const sf::Vector2f& vec2)
 
 public:
     static const int TILE_WIDTH = 64; // the width of a level tile in pixel-space

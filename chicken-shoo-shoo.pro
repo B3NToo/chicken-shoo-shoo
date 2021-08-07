@@ -18,8 +18,6 @@ SOURCES += \
         levelloader.cpp \
         main.cpp \
         rectangle.cpp \
-        testbase.cpp \
-        testchild.cpp \
         tile.cpp \
         utils.cpp
 
@@ -47,7 +45,5 @@ HEADERS += \
     level.h \
     levelloader.h \
     rectangle.h \
-    testbase.h \
-    testchild.h \
     tile.h \
     utils.h

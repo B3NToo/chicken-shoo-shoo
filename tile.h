@@ -4,7 +4,12 @@
 
 class Tile : public Drawable {
 public:
-    Tile();
+    Tile(float x, float y, char type);
+    virtual sf::RectangleShape *getShape() const override;
+
+private:
+    sf::RectangleShape* shape;
+    char type;
 };
 
 #endif // TILE_H

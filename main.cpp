@@ -3,8 +3,6 @@
 #include <iostream>
 #include "utils.h"
 #include "rectangle.h"
-#include "testbase.h"
-#include "testchild.h"
 
 /* TODO:
  * - tile class
@@ -84,6 +82,7 @@ int main() {
         game.readInputs();
         game.update();
         game.draw();
+        window->display();
     }
 
     delete window;

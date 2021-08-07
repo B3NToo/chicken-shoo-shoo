@@ -76,7 +76,6 @@ void Game::draw() {
             newPos.y -= topLeft.y;
             newPos = Utils::tileSpaceToPixelSpace(newPos);
             (**i).getShape()->setPosition(newPos);
-            std::cout << (**i).getT()->test() << std::endl;
 //            sf::RectangleShape r(sf::Vector2f(200,200));
 //            r.setFillColor(sf::Color::Yellow);
 //            this->window->draw(r);
@@ -120,6 +119,7 @@ void Game::update() {
 
     // collect every LevelElement the Movable passes, in the order it passes them
 
+
     // for every collected LevelElement, if the LevelElement is not unoccupied (aka '.'),
     // call that LevelElement's collision handling function, then break;
 
@@ -130,7 +130,43 @@ void Game::update() {
 }
 
 void Game::moveAvatar() {
+    // get avatar acceleration vector from user inputs
     sf::Vector2f inputVel = this->calculateInputDirection();
+
+    // scale it down so it doesn't go too fast
+    Utils::scaleVector(inputVel, 0.004);
+
+    // find the smallest rectangle still including all possible collision tiles, stretching from xMin/yMin to xMax/yMax
+    sf::Vector2f newPos = Utils::addVectors(this->avatar.getPos(), inputVel);
+    float xMin = this->avatar.getPos().x;
+    float xMax = newPos.x;
+    if(xMin > xMax) {
+        std::swap(xMin, xMax);
+    }
+
+    float yMin = this->avatar.getPos().y;
+    float yMax = newPos.y;
+    if(yMin > yMax) {
+        std::swap(yMin, yMax);
+    }
+
+    sf::Vector2f colP;
+    sf::Vector2f normal;
+    float tCol;
+    // might have to reverse some ordering here, depending on the velocity vector's direction
+    // lots of room for performance improvement here
+    for (int i = xMin; i < xMax; i++) {
+        for (int j = yMin; j < yMax; j++) {
+            char tileType = this->getTile(i,j);
+            if(tileType != '.') {
+                Tile t(i, j, tileType);
+                if(Utils::movingRectangleCollidesWithRectangle(&(this->avatar), &t, colP, normal, tCol) && tCol < 1.0) {
+
+                }
+            }
+        }
+    }
+
     this->avatar.update(inputVel);
 }
 

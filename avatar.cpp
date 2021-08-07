@@ -40,11 +40,3 @@ Avatar::Avatar(const Avatar& other) {
     this->shape->setFillColor(sf::Color::Magenta);
     this->vel = other.vel;
 }
-
-int Avatar::test() {
-    return 10;
-}
-
-testChild *Avatar::getT() const {
-    return this->t;
-}

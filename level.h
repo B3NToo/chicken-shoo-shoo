@@ -20,8 +20,8 @@ public:
 
 private:
     std::string structure; // an array of chars representing the level, with each char representing a single level tile
-    int height;
     int width;
+    int height;
 };
 
 #endif // LEVEL_H

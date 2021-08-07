@@ -13,6 +13,7 @@
 #include "level.h"
 #include "levelloader.h"
 #include <math.h>
+#include "tile.h"
 
 
 class Game {

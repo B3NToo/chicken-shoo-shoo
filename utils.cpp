@@ -196,6 +196,11 @@ sf::Vector2f Utils::scaleVector(sf::Vector2f& vec, float scale) {
     return vec;
 }
 
-
+sf::Vector2f Utils::addVectors(const sf::Vector2f &vec1, const sf::Vector2f &vec2) {
+    sf::Vector2f toReturn;
+    toReturn.x = vec1.x + vec2.x;
+    toReturn.y = vec1.y + vec2.y;
+    return toReturn;
+}
 
 
