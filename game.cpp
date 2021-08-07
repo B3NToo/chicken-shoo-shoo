@@ -6,6 +6,7 @@ Game::Game(sf::RenderWindow *_window) {
     InputHandler (this->inputs);
     std::vector<Drawable*> (this->drawables);
     this->avatar = Avatar();
+    this->avatar.setPos(2.0,2.0); // for debugging
     LevelLoader (this->loader);
     Camera (this->camera);
 
@@ -135,6 +136,7 @@ void Game::moveAvatar() {
 
     // scale it down so it doesn't go too fast
     Utils::scaleVector(inputVel, 0.004);
+    this->avatar.setVel(inputVel);
 
     // find the smallest rectangle still including all possible collision tiles, stretching from xMin/yMin to xMax/yMax
     sf::Vector2f newPos = Utils::addVectors(this->avatar.getPos(), inputVel);
@@ -150,24 +152,30 @@ void Game::moveAvatar() {
         std::swap(yMin, yMax);
     }
 
+
+
     sf::Vector2f colP;
     sf::Vector2f normal;
     float tCol;
     // might have to reverse some ordering here, depending on the velocity vector's direction
     // lots of room for performance improvement here
-    for (int i = xMin; i < xMax; i++) {
-        for (int j = yMin; j < yMax; j++) {
+    for (int i = xMin - 1; i < xMax + 1; i++) {
+        for (int j = yMin - 1; j < yMax + 1; j++) {
             char tileType = this->getTile(i,j);
             if(tileType != '.') {
                 Tile t(i, j, tileType);
                 if(Utils::movingRectangleCollidesWithRectangle(&(this->avatar), &t, colP, normal, tCol) && tCol < 1.0) {
-
+                    inputVel.x += normal.x * std::abs(inputVel.x) * (1 - tCol);
+                    inputVel.y += normal.y * std::abs(inputVel.y) * (1 - tCol);
+                    this->avatar.setVel(inputVel);
                 }
+
             }
         }
     }
 
-    this->avatar.update(inputVel);
+    this->avatar.setPos(Utils::addVectors(this->avatar.getPos(), inputVel));
+    //this->avatar.update(inputVel);
 }
 
 void Game::addDrawable(Drawable *d) {
