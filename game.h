@@ -31,7 +31,10 @@ private:
     void calculateVisibleTiles();
     char getTile(int x, int y);
     void drawBackgroundTile(float x, float y);
+    void drawBackgroundColTile(float x, float y);
     void drawWallTile(float x, float y);
+    bool checkForTileCollision(int x, int y, const Drawable* movingRect, sf::Vector2f& collisionPoint,
+                               sf::Vector2f& normal, float& tCollision);
 public:
 
 private:
@@ -45,5 +48,6 @@ private:
     InputHandler inputs;
     int visibleTilesX; // amount of tiles that fit inside the screen in a single row
     int visibleTilesY; // amount of tiles that fit inside the screen in a single column
+    std::vector<Tile> cols; // for debugging
 };
 

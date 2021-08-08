@@ -68,6 +68,10 @@ bool Utils::rayCollidesWithRectangle(const sf::Vector2f &rayOrigin, const sf::Ve
     float tFurtherX = (rect->getPos().x + rect->getSize().x - rayOrigin.x) / rayDir.x;
     float tFurtherY = (rect->getPos().y + rect->getSize().y - rayOrigin.y) / rayDir.y;
 
+    if(std::isnan(tCloserX) || std::isnan(tCloserY) || std::isnan(tFurtherX) || std::isnan(tFurtherY)) {
+        return false;
+    }
+
     // make sure tCloser is actually closer than tFurther:
     if (tCloserX > tFurtherX) {
         std::swap(tCloserX, tFurtherX);
@@ -77,7 +81,7 @@ bool Utils::rayCollidesWithRectangle(const sf::Vector2f &rayOrigin, const sf::Ve
     }
 
     // if the ray collides collides with the rectangle's borders, and not just their extansions, then tCloserX < tFurtherY && tCloserY < tFurtherX, else they do not collide
-    if (tCloserX > tFurtherY || tCloserY > tFurtherX) {
+    if (tCloserX >= tFurtherY || tCloserY >= tFurtherX) {
         return false;
     }
 

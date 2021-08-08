@@ -77,11 +77,15 @@ void Game::draw() {
             newPos.y -= topLeft.y;
             newPos = Utils::tileSpaceToPixelSpace(newPos);
             (**i).getShape()->setPosition(newPos);
-//            sf::RectangleShape r(sf::Vector2f(200,200));
-//            r.setFillColor(sf::Color::Yellow);
-//            this->window->draw(r);
             this->window->draw(*((**i).getShape()));
         }
+    }
+
+    for (std::vector<Tile>::iterator i = this->cols.begin(); i != this->cols.end(); ++i) {
+        // if it is visible, draw it!
+        // double asterisk ** because we are following the iterator pointer, which is pointing at
+        // an element of a vector of pointers, which in turn is also a pointer
+        this->drawBackgroundColTile(i->getPos().x - topLeft.x, i->getPos().y - topLeft.y);
     }
 }
 
@@ -113,6 +117,8 @@ void Game::readInputs() {
 }
 
 void Game::update() {
+    this->cols.clear();
+
     // move everything that needs to be moved
     this->moveAvatar();
 
@@ -140,39 +146,63 @@ void Game::moveAvatar() {
 
     // find the smallest rectangle still including all possible collision tiles, stretching from xMin/yMin to xMax/yMax
     sf::Vector2f newPos = Utils::addVectors(this->avatar.getPos(), inputVel);
-    float xMin = this->avatar.getPos().x;
-    float xMax = newPos.x;
-    if(xMin > xMax) {
-        std::swap(xMin, xMax);
-    }
-
-    float yMin = this->avatar.getPos().y;
-    float yMax = newPos.y;
-    if(yMin > yMax) {
-        std::swap(yMin, yMax);
-    }
-
-
+    float xStart = this->avatar.getPos().x;
+    float xEnd = newPos.x;
+    float yStart = this->avatar.getPos().y;
+    float yEnd = newPos.y;
 
     sf::Vector2f colP;
     sf::Vector2f normal;
     float tCol;
-    // might have to reverse some ordering here, depending on the velocity vector's direction
-    // lots of room for performance improvement here
-    for (int i = xMin - 1; i < xMax + 1; i++) {
-        for (int j = yMin - 1; j < yMax + 1; j++) {
-            char tileType = this->getTile(i,j);
-            if(tileType != '.') {
-                Tile t(i, j, tileType);
-                if(Utils::movingRectangleCollidesWithRectangle(&(this->avatar), &t, colP, normal, tCol) && tCol < 1.0) {
-                    inputVel.x += normal.x * std::abs(inputVel.x) * (1 - tCol);
-                    inputVel.y += normal.y * std::abs(inputVel.y) * (1 - tCol);
-                    this->avatar.setVel(inputVel);
-                }
 
+    if(xStart > xEnd) {
+        if(yStart < yEnd) {
+            for (int i = xStart + 1; i > xEnd - 1; i--) {
+                for (int j = yStart; j < yEnd + 1; j++) {
+                    if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
+                        inputVel.x += normal.x * std::abs(inputVel.x) * (1 - tCol);
+                        inputVel.y += normal.y * std::abs(inputVel.y) * (1 - tCol);
+                        this->avatar.setVel(inputVel);
+                    }
+                }
+            }
+        } else {
+            for (int i = xStart + 1; i > xEnd - 1; i--) {
+                for (int j = yStart + 1; j > yEnd - 1; j--) {
+                    if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
+                        inputVel.x += normal.x * std::abs(inputVel.x) * (1 - tCol);
+                        inputVel.y += normal.y * std::abs(inputVel.y) * (1 - tCol);
+                        this->avatar.setVel(inputVel);
+                    }
+                }
+            }
+        }
+    } else {
+        if(yStart < yEnd) {
+            for (int i = xStart; i < xEnd + 1; i++) {
+                for (int j = yStart; j < yEnd + 1; j++) {
+                    if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
+                        inputVel.x += normal.x * std::abs(inputVel.x) * (1 - tCol);
+                        inputVel.y += normal.y * std::abs(inputVel.y) * (1 - tCol);
+                        this->avatar.setVel(inputVel);
+                    }
+                }
+            }
+        } else {
+            for (int i = xStart ; i < xEnd + 1; i++) {
+                for (int j = yStart + 1; j > yEnd - 1; j--) {
+                    if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
+                        inputVel.x += normal.x * std::abs(inputVel.x) * (1 - tCol);
+                        inputVel.y += normal.y * std::abs(inputVel.y) * (1 - tCol);
+                        this->avatar.setVel(inputVel);
+                    }
+                }
             }
         }
     }
+
+    // might have to reverse some ordering here, depending on the velocity vector's direction
+    // lots of room for performance improvement here
 
     this->avatar.setPos(Utils::addVectors(this->avatar.getPos(), inputVel));
     //this->avatar.update(inputVel);
@@ -242,6 +272,13 @@ void Game::drawBackgroundTile(float x, float y) {
     this->window->draw(tileShape);
 }
 
+void Game::drawBackgroundColTile(float x, float y) {
+    sf::RectangleShape tileShape(sf::Vector2f(Utils::TILE_WIDTH, Utils::TILE_HEIGHT));
+    tileShape.setPosition(x * Utils::TILE_WIDTH, y * Utils::TILE_HEIGHT);
+    tileShape.setFillColor(sf::Color::Red);
+    this->window->draw(tileShape);
+}
+
 void Game::drawWallTile(float x, float y) {
     sf::RectangleShape tileShape(sf::Vector2f(Utils::TILE_WIDTH, Utils::TILE_HEIGHT));
     tileShape.setPosition(x * Utils::TILE_WIDTH, y * Utils::TILE_HEIGHT);
@@ -249,6 +286,18 @@ void Game::drawWallTile(float x, float y) {
     this->window->draw(tileShape);
 }
 
+bool Game::checkForTileCollision(int x, int y, const Drawable *movingRect, sf::Vector2f &collisionPoint, sf::Vector2f &normal, float &tCollision) {
+    char tileType = this->getTile(x,y);
+    if(tileType != '.') {
+        Tile t(x, y, tileType);
+        if(Utils::movingRectangleCollidesWithRectangle(movingRect, &t, collisionPoint, normal, tCollision) && tCollision < 1.0) {
+            this->cols.push_back(t);
+            return true;
+        }
+    }
+
+    return false;
+}
 /****** GETTERS & SETTERS *******/
 
 sf::RenderWindow *Game::getWindow() const
