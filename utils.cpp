@@ -68,7 +68,7 @@ bool Utils::rayCollidesWithRectangle(const sf::Vector2f &rayOrigin, const sf::Ve
     float tFurtherX = (rect->getPos().x + rect->getSize().x - rayOrigin.x) / rayDir.x;
     float tFurtherY = (rect->getPos().y + rect->getSize().y - rayOrigin.y) / rayDir.y;
 
-    if(std::isnan(tCloserX) || std::isnan(tCloserY) || std::isnan(tFurtherX) || std::isnan(tFurtherY)) {
+    if(isnan(tCloserX) || isnan(tCloserY) || isnan(tFurtherX) || isnan(tFurtherY)) {
         return false;
     }
 
@@ -132,7 +132,7 @@ float Utils::vecToDeg(const sf::Vector2f vec) {
 }
 
 float Utils::radToDeg(const float rad) {
-    return rad * 180 / M_PI;
+    return rad * 180.f / M_PI;
 }
 
 sf::RectangleShape Utils::makeLine(const sf::Vector2f start, const sf::Vector2f end, sf::Color color) {
@@ -161,7 +161,7 @@ sf::RectangleShape Utils::makeLine(const sf::Vector2f start, const sf::Vector2f 
 
 bool Utils::movingRectangleCollidesWithRectangle(const Drawable* dynamicRect, const Drawable* targetRect, sf::Vector2f &collisionPoint, sf::Vector2f &normal, float &tCollision) {
     // if our dynamic rectangle is not moving, it can't collide with a static rectangle
-    if(dynamicRect->getVel().x == 0 && dynamicRect->getVel().y == 0) {
+    if(dynamicRect->getVel().x == 0.f && dynamicRect->getVel().y == 0.f) {
         return false;
     }
     // create a rectangle around the target rectangle, whose borders will be bigger by half the dynamic rectangle's size
@@ -185,9 +185,10 @@ bool Utils::movingRectangleCollidesWithRectangle(const Drawable* dynamicRect, co
     return false;
 }
 
+// keeps the vector direction but scale it to the length of 1
 sf::Vector2f Utils::normalizeVector(const sf::Vector2f vec) {
-        float length = sqrt((vec.x * vec.x) + (vec.y * vec.y));
-        if (length != 0) {
+        float length = Utils::vectorLength(vec);
+        if (length != 0.f) {
             return sf::Vector2f(vec.x / length, vec.y / length);
         } else {
             return vec;
@@ -207,4 +208,7 @@ sf::Vector2f Utils::addVectors(const sf::Vector2f &vec1, const sf::Vector2f &vec
     return toReturn;
 }
 
+float Utils::vectorLength(const sf::Vector2f vec) {
+    return sqrt((vec.x * vec.x) + (vec.y * vec.y));
+}
 

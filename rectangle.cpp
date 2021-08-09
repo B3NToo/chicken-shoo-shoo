@@ -9,3 +9,7 @@ Rectangle::Rectangle(sf::Vector2f _pos, sf::Vector2f _size, sf::RectangleShape* 
 sf::RectangleShape *Rectangle::getShape() const {
     return this->shape;
 }
+
+bool Rectangle::isVisible() const {
+    return true;
+}

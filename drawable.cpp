@@ -41,6 +41,10 @@ void Drawable::setVel(const sf::Vector2f &value)
     vel = value;
 }
 
+void Drawable::setVel(const float &x, const float &y) {
+    this->vel = sf::Vector2f(x, y);
+}
+
 void Drawable::setPos(float x, float y) {
     this->pos = sf::Vector2f(x, y);
 }

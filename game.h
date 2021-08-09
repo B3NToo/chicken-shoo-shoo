@@ -26,7 +26,7 @@ public:
     void addDrawable(Drawable *d);
     sf::Vector2f calculateInputDirection();
 private:
-    void moveAvatar();
+    void moveAvatar(sf::Time elapsed);
     bool isTouchingGround(Drawable* d); // this should probably be Movable, but Movable is not implemented yet
     void calculateVisibleTiles();
     char getTile(int x, int y);
@@ -35,6 +35,8 @@ private:
     void drawWallTile(float x, float y);
     bool checkForTileCollision(int x, int y, const Drawable* movingRect, sf::Vector2f& collisionPoint,
                                sf::Vector2f& normal, float& tCollision);
+    bool isJumping();
+    sf::Vector2f calculateFriction(const sf::Vector2f &vel);
 public:
 
 private:
@@ -49,5 +51,6 @@ private:
     int visibleTilesX; // amount of tiles that fit inside the screen in a single row
     int visibleTilesY; // amount of tiles that fit inside the screen in a single column
     std::vector<Tile> cols; // for debugging
+    sf::Clock clock;
 };
 

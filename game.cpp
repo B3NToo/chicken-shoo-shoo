@@ -1,14 +1,14 @@
 #include "game.h"
 
-Game::Game(sf::RenderWindow *_window) {
-    // instantiate fields (could be done via initializer list, but this way reads cleaner)
-    this->window = _window;
-    InputHandler (this->inputs);
-    std::vector<Drawable*> (this->drawables);
-    this->avatar = Avatar();
-    this->avatar.setPos(2.0,2.0); // for debugging
-    LevelLoader (this->loader);
-    Camera (this->camera);
+Game::Game(sf::RenderWindow *_window) : window(_window),
+                                        inputs(InputHandler()),
+                                        drawables(std::vector<Drawable*>()),
+                                        avatar(Avatar()),
+                                        loader(LevelLoader()),
+                                        camera(Camera()),
+                                        clock(sf::Clock()) {
+    // for debugging
+    avatar.setPos(2.0, 2.0);
 
     // calculate how many tiles will need to be drawn to the screen in one frame
     this->calculateVisibleTiles();
@@ -17,10 +17,7 @@ Game::Game(sf::RenderWindow *_window) {
     this->currentLevel = this->loader.getLevel(0);
 
     // add everything that will need to be drawn to drawables
-    Avatar* aptr = &(this->avatar);
-    this->addDrawable(aptr);
-
-    this->currentLevel = this->loader.getLevel(0);
+    this->addDrawable(&(this->avatar));
 }
 
 // draws every element that is currently visible in the camera frame
@@ -33,13 +30,14 @@ void Game::draw() {
     topLeft.y = this->camera.getPos().y - (float)this->visibleTilesY / 2.0;
 
     // clamp camera
-    if(topLeft.x < 0) {
-        topLeft.x = 0;
+    if(topLeft.x < 0.f) {
+        topLeft.x = 0.f;
     } else if (topLeft.x > this->currentLevel.getWidth() - this->visibleTilesX) {
         topLeft.x =  this->currentLevel.getWidth() - this->visibleTilesX;
     }
-    if(topLeft.y < 0) {
-        topLeft.y = 0;
+
+    if(topLeft.y < 0.f) {
+        topLeft.y = 0.f;
     } else if (topLeft.y > this->currentLevel.getHeight() - this->visibleTilesY) {
         topLeft.y =  this->currentLevel.getHeight() - this->visibleTilesY;
     }
@@ -82,9 +80,6 @@ void Game::draw() {
     }
 
     for (std::vector<Tile>::iterator i = this->cols.begin(); i != this->cols.end(); ++i) {
-        // if it is visible, draw it!
-        // double asterisk ** because we are following the iterator pointer, which is pointing at
-        // an element of a vector of pointers, which in turn is also a pointer
         this->drawBackgroundColTile(i->getPos().x - topLeft.x, i->getPos().y - topLeft.y);
     }
 }
@@ -117,10 +112,11 @@ void Game::readInputs() {
 }
 
 void Game::update() {
+    sf::Time elapsed = this->clock.restart();
     this->cols.clear();
 
     // move everything that needs to be moved
-    this->moveAvatar();
+    this->moveAvatar(elapsed);
 
     // check for collision
 
@@ -136,16 +132,47 @@ void Game::update() {
     this->camera.update(this->avatar.getPos());
 }
 
-void Game::moveAvatar() {
-    // get avatar acceleration vector from user inputs
-    sf::Vector2f inputVel = this->calculateInputDirection();
+void Game::moveAvatar(sf::Time elapsed) {
+    // add avatar acceleration vector from user inputs
+    sf::Vector2f newVel = this->calculateInputDirection();
 
-    // scale it down so it doesn't go too fast
-    Utils::scaleVector(inputVel, 0.004);
-    this->avatar.setVel(inputVel);
+    // add forces
+    newVel = Utils::addVectors(newVel, this->currentLevel.getGravity());
+
+    // scale it to time
+    Utils::scaleVector(newVel, elapsed.asSeconds()*0.04);
+
+    // is the avatar jumping?
+    if (this->isJumping()) {
+        newVel.y -= 0.03;
+    }
+
+    // add the element's current speed
+    newVel = Utils::addVectors(newVel, this->avatar.getVel());
+
+    // add some friction
+    newVel = Utils::addVectors(newVel, this->calculateFriction(newVel));
+
+    // clip speed
+    float xMaxSpeed = 0.01;
+    if (newVel.x > xMaxSpeed) {
+        newVel.x = xMaxSpeed;
+    } else if (newVel.x < -xMaxSpeed) {
+        newVel.x = -xMaxSpeed;
+    }
+
+    float yMaxSpeed = 0.5;
+    if (newVel.y > yMaxSpeed) {
+        std::cout << "hot" << std::endl;
+        newVel.y = yMaxSpeed;
+    } else if (newVel.y < -yMaxSpeed) {
+        newVel.y = -yMaxSpeed;
+    }
+
+    this->avatar.setVel(newVel);
 
     // find the smallest rectangle still including all possible collision tiles, stretching from xMin/yMin to xMax/yMax
-    sf::Vector2f newPos = Utils::addVectors(this->avatar.getPos(), inputVel);
+    sf::Vector2f newPos = Utils::addVectors(this->avatar.getPos(), newVel);
     float xStart = this->avatar.getPos().x;
     float xEnd = newPos.x;
     float yStart = this->avatar.getPos().y;
@@ -158,11 +185,11 @@ void Game::moveAvatar() {
     if(xStart > xEnd) {
         if(yStart < yEnd) {
             for (int i = xStart + 1; i > xEnd - 1; i--) {
-                for (int j = yStart; j < yEnd + 1; j++) {
+                for (int j = yStart; j < yEnd + 2; j++) {
                     if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
-                        inputVel.x += normal.x * std::abs(inputVel.x) * (1 - tCol);
-                        inputVel.y += normal.y * std::abs(inputVel.y) * (1 - tCol);
-                        this->avatar.setVel(inputVel);
+                        newVel.x += normal.x * std::abs(newVel.x) * (1 - tCol);
+                        newVel.y += normal.y * std::abs(newVel.y) * (1 - tCol);
+                        this->avatar.setVel(newVel);
                     }
                 }
             }
@@ -170,31 +197,33 @@ void Game::moveAvatar() {
             for (int i = xStart + 1; i > xEnd - 1; i--) {
                 for (int j = yStart + 1; j > yEnd - 1; j--) {
                     if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
-                        inputVel.x += normal.x * std::abs(inputVel.x) * (1 - tCol);
-                        inputVel.y += normal.y * std::abs(inputVel.y) * (1 - tCol);
-                        this->avatar.setVel(inputVel);
+                        newVel.x += normal.x * std::abs(newVel.x) * (1 - tCol);
+                        newVel.y += normal.y * std::abs(newVel.y) * (1 - tCol);
+                        this->avatar.setVel(newVel);
                     }
                 }
             }
         }
     } else {
         if(yStart < yEnd) {
-            for (int i = xStart; i < xEnd + 1; i++) {
-                for (int j = yStart; j < yEnd + 1; j++) {
+
+            for (int i = xStart; i < xEnd + 2; i++) {
+                for (int j = yStart; j < yEnd + 2; j++) {
+
                     if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
-                        inputVel.x += normal.x * std::abs(inputVel.x) * (1 - tCol);
-                        inputVel.y += normal.y * std::abs(inputVel.y) * (1 - tCol);
-                        this->avatar.setVel(inputVel);
+                        newVel.x += normal.x * std::abs(newVel.x) * (1 - tCol);
+                        newVel.y += normal.y * std::abs(newVel.y) * (1 - tCol);
+                        this->avatar.setVel(newVel);
                     }
                 }
             }
         } else {
-            for (int i = xStart ; i < xEnd + 1; i++) {
+            for (int i = xStart ; i < xEnd + 2; i++) {
                 for (int j = yStart + 1; j > yEnd - 1; j--) {
                     if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
-                        inputVel.x += normal.x * std::abs(inputVel.x) * (1 - tCol);
-                        inputVel.y += normal.y * std::abs(inputVel.y) * (1 - tCol);
-                        this->avatar.setVel(inputVel);
+                        newVel.x += normal.x * std::abs(newVel.x) * (1 - tCol);
+                        newVel.y += normal.y * std::abs(newVel.y) * (1 - tCol);
+                        this->avatar.setVel(newVel);
                     }
                 }
             }
@@ -204,8 +233,7 @@ void Game::moveAvatar() {
     // might have to reverse some ordering here, depending on the velocity vector's direction
     // lots of room for performance improvement here
 
-    this->avatar.setPos(Utils::addVectors(this->avatar.getPos(), inputVel));
-    //this->avatar.update(inputVel);
+    this->avatar.setPos(Utils::addVectors(this->avatar.getPos(), this->avatar.getVel()));
 }
 
 void Game::addDrawable(Drawable *d) {
@@ -225,28 +253,36 @@ sf::Vector2f Game::calculateInputDirection() {
         direction.x++;
     }
 
-    // up and down just for testing, in the final game they shouldn't move the player up or down, but rather do something else, like duck
-    if(this->inputs.getKeyStates().at(this->inputs.up)) {
-        direction.y--;
-    }
+    return direction;
+}
 
-    if(this->inputs.getKeyStates().at(this->inputs.down)) {
-        direction.y++;
-    }
-
+bool Game::isJumping() {
     // if the jump key is pressed, check if the avatar is on the ground
     if(this->inputs.getKeyStates().at(this->inputs.jump)) {
         if (this->isTouchingGround(&(this->avatar))) {
-            direction.y++;
+            return true;
         }
     }
 
-    return direction;
+    return false;
 }
 
 // check if the drawable element's bottom is touching a ground tile
 bool Game::isTouchingGround(Drawable* d) {
-    return true;
+    // is the drawable's y position not in the middle of a tile?
+    if (fmod(d->getPos().y,1) < 0.01 || fmod(d->getPos().y,1) > 0.99) {
+        //std::cout << d->getPos().y - floor(d->getPos().y) << std::endl;
+        // is the tile below the drawable a ground tile?
+        if(this->getTile(d->getPos().x, d->getPos().y + 1) == '#') {
+            return true;
+        } else if (d->getPos().x - floor(d->getPos().x) > 0) {
+            if(this->getTile(d->getPos().x + 1, d->getPos().y + 1) == '#') {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 // calculate how many tiles will need to be drawn on screen at once at any time
@@ -297,6 +333,13 @@ bool Game::checkForTileCollision(int x, int y, const Drawable *movingRect, sf::V
     }
 
     return false;
+}
+
+sf::Vector2f Game::calculateFriction(const sf::Vector2f &vel) {
+    // friction is a small vector pointing in the opposite direction of the object's velocity
+    sf::Vector2f toReturn = vel;
+    Utils::scaleVector(toReturn, -0.005);
+    return toReturn;
 }
 /****** GETTERS & SETTERS *******/
 

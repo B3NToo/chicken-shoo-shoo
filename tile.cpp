@@ -8,3 +8,7 @@ Tile::Tile(float x, float y, char tileType) {
 sf::RectangleShape* Tile::getShape() const {
     return this->shape;
 }
+
+bool Tile::isVisible() const {
+    return true;
+}

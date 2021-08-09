@@ -12,7 +12,8 @@ public:
     ~Avatar();
     void update(sf::Vector2f inputVel);
 
-    virtual sf::RectangleShape *getShape() const override;
+    sf::RectangleShape *getShape() const override;
+    bool isVisible() const override;
     void setShape(sf::RectangleShape *value);
     sf::RectangleShape* shape;
 };

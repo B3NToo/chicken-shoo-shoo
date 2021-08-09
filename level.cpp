@@ -1,11 +1,11 @@
-#include "level.h"
+ #include "level.h"
 
 Level::Level() {
 
 }
 
 Level::Level(std::string _structure, int _width, int _height) : structure(_structure), width(_width), height(_height) {
-
+    this->gravity = sf::Vector2f(0.0, 1.0);
 }
 
 int Level::getWidth() const
@@ -36,4 +36,14 @@ std::string Level::getStructure() const
 void Level::setStructure(const std::string &value)
 {
     structure = value;
+}
+
+sf::Vector2f Level::getGravity() const
+{
+    return gravity;
+}
+
+void Level::setGravity(const sf::Vector2f &value)
+{
+    gravity = value;
 }
