@@ -212,3 +212,9 @@ float Utils::vectorLength(const sf::Vector2f vec) {
     return sqrt((vec.x * vec.x) + (vec.y * vec.y));
 }
 
+sf::Vector2f Utils::subtractVectors(const sf::Vector2f &vec1, const sf::Vector2f &vec2) {
+    sf::Vector2f toReturn;
+    toReturn.x = vec1.x - vec2.x;
+    toReturn.y = vec1.y - vec2.y;
+    return toReturn;
+}

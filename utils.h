@@ -29,6 +29,7 @@ public:
     static sf::Vector2f normalizeVector(const sf::Vector2f vec);
     static sf::Vector2f scaleVector(sf::Vector2f& vec, float scale);
     static sf::Vector2f addVectors(const sf::Vector2f& vec1, const sf::Vector2f& vec2);
+    static sf::Vector2f subtractVectors(const sf::Vector2f& vec1, const sf::Vector2f& vec2);
     static float vectorLength(const sf::Vector2f vec);
 
 public:

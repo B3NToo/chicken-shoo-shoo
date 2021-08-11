@@ -128,8 +128,14 @@ void Game::update() {
 
 
 
-    // set camera position to avatar position
-    this->camera.update(this->avatar.getPos());
+    // set camera position to follow avatar position
+    sf::Vector2f newCamPos = this->camera.getPos();
+    newCamPos = Utils::subtractVectors(this->avatar.getPos(), newCamPos);
+
+    // make the camera "lazy", meaning it's trailing behind the avatar
+    newCamPos = Utils::scaleVector(newCamPos, 0.006);
+    newCamPos = Utils::addVectors(this->camera.getPos(), newCamPos);
+    this->camera.update(newCamPos);
 }
 
 void Game::moveAvatar(sf::Time elapsed) {
@@ -144,7 +150,7 @@ void Game::moveAvatar(sf::Time elapsed) {
 
     // is the avatar jumping?
     if (this->isJumping()) {
-        newVel.y -= 0.03;
+        newVel.y -= 0.0375;
     }
 
     // add the element's current speed
@@ -185,7 +191,7 @@ void Game::moveAvatar(sf::Time elapsed) {
     if(xStart > xEnd) {
         if(yStart < yEnd) {
             for (int i = xStart + 1; i > xEnd - 1; i--) {
-                for (int j = yStart; j < yEnd + 2; j++) {
+                for (int j = yStart; j < yEnd + 3; j++) {
                     if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
                         newVel.x += normal.x * std::abs(newVel.x) * (1 - tCol);
                         newVel.y += normal.y * std::abs(newVel.y) * (1 - tCol);
@@ -207,8 +213,8 @@ void Game::moveAvatar(sf::Time elapsed) {
     } else {
         if(yStart < yEnd) {
 
-            for (int i = xStart; i < xEnd + 2; i++) {
-                for (int j = yStart; j < yEnd + 2; j++) {
+            for (int i = xStart; i < xEnd + 3; i++) {
+                for (int j = yStart; j < yEnd + 3; j++) {
 
                     if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
                         newVel.x += normal.x * std::abs(newVel.x) * (1 - tCol);
@@ -218,7 +224,7 @@ void Game::moveAvatar(sf::Time elapsed) {
                 }
             }
         } else {
-            for (int i = xStart ; i < xEnd + 2; i++) {
+            for (int i = xStart ; i < xEnd + 3; i++) {
                 for (int j = yStart + 1; j > yEnd - 1; j--) {
                     if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
                         newVel.x += normal.x * std::abs(newVel.x) * (1 - tCol);
