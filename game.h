@@ -27,6 +27,7 @@ public:
     sf::Vector2f calculateInputDirection();
 private:
     void moveAvatar(sf::Time elapsed);
+    void moveChicken();
     bool isTouchingGround(Drawable* d); // this should probably be Movable, but Movable is not implemented yet
     void calculateVisibleTiles();
     char getTile(int x, int y);

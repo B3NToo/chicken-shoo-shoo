@@ -4,6 +4,7 @@ Game::Game(sf::RenderWindow *_window) : window(_window),
                                         inputs(InputHandler()),
                                         drawables(std::vector<Drawable*>()),
                                         avatar(Avatar()),
+                                        chicken(Chicken()),
                                         loader(LevelLoader()),
                                         camera(Camera()),
                                         clock(sf::Clock()) {
@@ -18,6 +19,8 @@ Game::Game(sf::RenderWindow *_window) : window(_window),
 
     // add everything that will need to be drawn to drawables
     this->addDrawable(&(this->avatar));
+    this->addDrawable(&(this->chicken));
+
 }
 
 // draws every element that is currently visible in the camera frame
@@ -117,6 +120,7 @@ void Game::update() {
 
     // move everything that needs to be moved
     this->moveAvatar(elapsed);
+    this->moveChicken();
 
     // check for collision
 
@@ -242,6 +246,29 @@ void Game::moveAvatar(sf::Time elapsed) {
     // lots of room for performance improvement here
 
     this->avatar.setPos(Utils::addVectors(this->avatar.getPos(), this->avatar.getVel()));
+}
+
+void Game::moveChicken() {
+
+    float avX = this->avatar.getPos().x;
+    float avY = this->avatar.getPos().y;
+
+    float chX = this->chicken.getPos().x;
+    float chY = this->chicken.getPos().y;
+
+    // distance between chicken and avatar
+    float distance = sqrt((chX - avX) * (chX - avX) + (chY - avY) * (chY - avY));
+
+    if (distance < 1.0f) {
+        // checks if avatar is right or left from chicken
+        if ((chX - avX) > 0) {
+            // right
+            this->chicken.setPos((chX + 1.0f), chY);
+        } else {
+            // left
+            this->chicken.setPos((chX - 1.0f), chY);
+        }
+    }
 }
 
 void Game::addDrawable(Drawable *d) {
