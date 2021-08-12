@@ -122,8 +122,123 @@ void Game::update() {
 
 
 
+<<<<<<< Updated upstream
     // set camera position to avatar position
     this->camera.update(this->avatar.getPos());
+=======
+    // set camera position to follow avatar position
+    sf::Vector2f newCamPos = this->camera.getPos();
+    newCamPos = Utils::subtractVectors(this->avatar.getPos(), newCamPos);
+
+    // make the camera "lazy", meaning it's trailing behind the avatar
+    newCamPos = Utils::scaleVector(newCamPos, 0.006);
+    newCamPos = Utils::addVectors(this->camera.getPos(), newCamPos);
+    this->camera.update(newCamPos);
+}
+
+void Game::moveAvatar(sf::Time elapsed) {
+    // add avatar acceleration vector from user inputs
+    sf::Vector2f newVel = this->calculateInputDirection();
+
+    // add forces
+    newVel = Utils::addVectors(newVel, this->currentLevel.getGravity());
+
+    // scale it to time
+    Utils::scaleVector(newVel, elapsed.asSeconds()*0.04);
+
+    // is the avatar jumping?
+    if (this->isJumping()) {
+        newVel.y -= 0.0375;
+    }
+
+    // add the element's current speed
+    newVel = Utils::addVectors(newVel, this->avatar.getVel());
+
+    // add some friction
+    newVel = Utils::addVectors(newVel, this->calculateFriction(newVel));
+
+    // clip speed
+    float xMaxSpeed = 0.01;
+    if (newVel.x > xMaxSpeed) {
+        newVel.x = xMaxSpeed;
+    } else if (newVel.x < -xMaxSpeed) {
+        newVel.x = -xMaxSpeed;
+    }
+
+    float yMaxSpeed = 0.5;
+    if (newVel.y > yMaxSpeed) {
+        std::cout << "hot" << std::endl;
+        newVel.y = yMaxSpeed;
+    } else if (newVel.y < -yMaxSpeed) {
+        newVel.y = -yMaxSpeed;
+    }
+
+    this->avatar.setVel(newVel);
+
+    // find the smallest rectangle still including all possible collision tiles, stretching from xMin/yMin to xMax/yMax
+    sf::Vector2f newPos = Utils::addVectors(this->avatar.getPos(), newVel);
+    float xStart = this->avatar.getPos().x;
+    float xEnd = newPos.x;
+    float yStart = this->avatar.getPos().y;
+    float yEnd = newPos.y;
+
+    sf::Vector2f colP;
+    sf::Vector2f normal;
+    float tCol;
+
+    if(xStart > xEnd) {
+        if(yStart < yEnd) {
+            for (int i = xStart + 1; i > xEnd - 1; i--) {
+                for (int j = yStart; j < yEnd + 3; j++) {
+                    if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
+                        newVel.x += normal.x * std::abs(newVel.x) * (1 - tCol);
+                        newVel.y += normal.y * std::abs(newVel.y) * (1 - tCol);
+                        this->avatar.setVel(newVel);
+                    }
+                }
+            }
+        } else {
+            for (int i = xStart + 1; i > xEnd - 1; i--) {
+                for (int j = yStart + 1; j > yEnd - 1; j--) {
+                    if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
+                        newVel.x += normal.x * std::abs(newVel.x) * (1 - tCol);
+                        newVel.y += normal.y * std::abs(newVel.y) * (1 - tCol);
+                        this->avatar.setVel(newVel);
+                    }
+                }
+            }
+        }
+    } else {
+        if(yStart < yEnd) {
+
+            for (int i = xStart; i < xEnd + 3; i++) {
+                for (int j = yStart; j < yEnd + 3; j++) {
+
+                    if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
+                        newVel.x += normal.x * std::abs(newVel.x) * (1 - tCol);
+                        newVel.y += normal.y * std::abs(newVel.y) * (1 - tCol);
+                        this->avatar.setVel(newVel);
+                    }
+                }
+            }
+        } else {
+            for (int i = xStart ; i < xEnd + 3; i++) {
+                for (int j = yStart + 1; j > yEnd - 1; j--) {
+                    if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
+                        newVel.x += normal.x * std::abs(newVel.x) * (1 - tCol);
+                        newVel.y += normal.y * std::abs(newVel.y) * (1 - tCol);
+                        this->avatar.setVel(newVel);
+                    }
+                }
+            }
+        }
+    }
+
+    // might have to reverse some ordering here, depending on the velocity vector's direction
+    // lots of room for performance improvement here
+
+    this->avatar.setPos(Utils::addVectors(this->avatar.getPos(), this->avatar.getVel()));
+>>>>>>> Stashed changes
 }
 
 void Game::moveAvatar() {
