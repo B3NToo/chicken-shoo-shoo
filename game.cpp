@@ -156,8 +156,10 @@ void Game::moveAvatar(sf::Time elapsed) {
     // add the element's current speed
     newVel = Utils::addVectors(newVel, this->avatar.getVel());
 
-    // add some friction
-    newVel = Utils::addVectors(newVel, this->calculateFriction(newVel));
+    // add some friction and scale it to time
+    sf::Vector2f friction = this->calculateFriction(newVel);
+    Utils::scaleVector(friction, elapsed.asSeconds());
+    newVel = Utils::addVectors(newVel, friction);
 
     // clip speed
     float xMaxSpeed = 0.01;
