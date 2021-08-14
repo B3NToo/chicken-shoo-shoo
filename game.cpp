@@ -7,7 +7,8 @@ Game::Game(sf::RenderWindow *_window) : window(_window),
                                         chicken(Chicken()),
                                         loader(LevelLoader()),
                                         camera(Camera()),
-                                        timeHandler(TimeHandler()) {
+                                        timeHandler(TimeHandler()),
+                                        recorder(AudioRecorder()) {
     // for debugging
     avatar.setPos(2.0, 2.0);
 
@@ -20,6 +21,23 @@ Game::Game(sf::RenderWindow *_window) : window(_window),
     // add everything that will need to be drawn to drawables
     this->addDrawable(&(this->avatar));
     this->addDrawable(&(this->chicken));
+
+    // set up audio
+    // get the available sound input device names
+    std::vector<std::string> availableDevices = sf::SoundRecorder::getAvailableDevices();
+
+    // choose a device
+    std::string inputDevice = availableDevices[0];
+
+    // set the device
+    if (!this->recorder.setDevice(inputDevice))
+    {
+        // error: device selection failed
+        std::cout << "no available audio recording device!" << std::endl;
+    }
+
+    // start the capture
+    recorder.start();
 
 }
 
@@ -136,16 +154,6 @@ void Game::update() {
         sf::Vector2f chickenVel = this->calculateChickenDirection();
         this->moveDrawable((&this->chicken), chickenVel, true);
 
-        // check for collision
-
-        // collect every LevelElement the Movable passes, in the order it passes them
-
-
-        // for every collected LevelElement, if the LevelElement is not unoccupied (aka '.'),
-        // call that LevelElement's collision handling function, then break;
-
-
-
         // set camera position to follow avatar position
         sf::Vector2f newCamPos = this->camera.getPos();
         newCamPos = Utils::subtractVectors(this->avatar.getPos(), newCamPos);
@@ -211,7 +219,7 @@ void Game::moveDrawable(Drawable *d, sf::Vector2f acc, bool affectedByGravity) {
     if(xStart > xEnd) {
         // y-direction is top to bottom
         if(yStart < yEnd) {
-            for (int i = xStart + 1; i > xEnd - 1; i--) {
+            for (int i = xStart + 1; i > xEnd - 2; i--) {
                 for (int j = yStart; j < yEnd + 3; j++) {
                     if (this->checkForTileCollision(i, j, d, colP, normal, tCol)) {
                         newVel.x += normal.x * std::abs(newVel.x) * (1 - tCol);
@@ -222,8 +230,8 @@ void Game::moveDrawable(Drawable *d, sf::Vector2f acc, bool affectedByGravity) {
             }
         } else {
             // y-direction is bottom to top or no y-velocity
-            for (int i = xStart + 1; i > xEnd - 1; i--) {
-                for (int j = yStart + 1; j > yEnd - 1; j--) {
+            for (int i = xStart + 1; i > xEnd - 2; i--) {
+                for (int j = yStart + 1; j > yEnd - 2; j--) {
                     if (this->checkForTileCollision(i, j, d, colP, normal, tCol)) {
                         newVel.x += normal.x * std::abs(newVel.x) * (1 - tCol);
                         newVel.y += normal.y * std::abs(newVel.y) * (1 - tCol);
@@ -248,7 +256,7 @@ void Game::moveDrawable(Drawable *d, sf::Vector2f acc, bool affectedByGravity) {
         } else {
             // y-direction is bottom to top or no y-velocity
             for (int i = xStart ; i < xEnd + 3; i++) {
-                for (int j = yStart + 1; j > yEnd - 1; j--) {
+                for (int j = yStart + 1; j > yEnd - 2; j--) {
                     if (this->checkForTileCollision(i, j, d, colP, normal, tCol)) {
                         newVel.x += normal.x * std::abs(newVel.x) * (1 - tCol);
                         newVel.y += normal.y * std::abs(newVel.y) * (1 - tCol);
@@ -261,29 +269,6 @@ void Game::moveDrawable(Drawable *d, sf::Vector2f acc, bool affectedByGravity) {
 
     // update object's position
     d->setPos(Utils::addVectors(d->getPos(), d->getVel()));
-}
-
-void Game::moveChicken() {
-
-    float avX = this->avatar.getPos().x;
-    float avY = this->avatar.getPos().y;
-
-    float chX = this->chicken.getPos().x;
-    float chY = this->chicken.getPos().y;
-
-    // distance between chicken and avatar
-    float distance = sqrt((chX - avX) * (chX - avX) + (chY - avY) * (chY - avY));
-
-    if (distance < 2.0f) {
-        // checks if avatar is right or left from chicken
-        if ((chX - avX) > 0) {
-            // right
-            this->chicken.setPos((chX + 1.0f), chY);
-        } else {
-            // left
-            this->chicken.setPos((chX - 1.0f), chY);
-        }
-    }
 }
 
 sf::Vector2f Game::calculateChickenDirection() {
@@ -306,6 +291,14 @@ sf::Vector2f Game::calculateChickenDirection() {
         } else {
             // left
             newVel.x -= 0.3;
+        }
+    }
+
+    // is the chicken being shooed? Check if the microphone input is above a threshold
+    if (this->recorder.getVolume() > 1000) {
+        if(this->isTouchingGround(&(this->chicken))) {
+            std::cout << "shoo" << std::endl;
+            newVel.y -= 0.7;
         }
     }
 

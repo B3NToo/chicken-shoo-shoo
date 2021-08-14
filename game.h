@@ -15,6 +15,8 @@
 #include <math.h>
 #include "tile.h"
 #include "timehandler.h"
+#include <SFML/Audio.hpp>
+#include "audiorecorder.h"
 
 
 class Game {
@@ -27,7 +29,6 @@ public:
     void addDrawable(Drawable *d);
     sf::Vector2f calculateInputDirection();
 private:
-    void moveChicken();
     bool isTouchingGround(Drawable* d); // this should probably be Movable, but Movable is not implemented yet
     void calculateVisibleTiles();
     char getTile(int x, int y);
@@ -53,8 +54,7 @@ private:
     int visibleTilesX; // amount of tiles that fit inside the screen in a single row
     int visibleTilesY; // amount of tiles that fit inside the screen in a single column
     std::vector<Tile> cols; // for debugging
-    float lastFrameMaxY;
-    bool maxYReached;
     TimeHandler timeHandler;
+    AudioRecorder recorder;
 };
 

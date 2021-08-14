@@ -10,7 +10,7 @@ public:
     Avatar();
     Avatar(const Avatar& other); // copy constructor
     ~Avatar();
-    void update(sf::Vector2f inputVel);
+    void update(sf::Vector2f inputVel); // probably deprecated
 
     sf::RectangleShape *getShape() const override;
     bool isVisible() const override;

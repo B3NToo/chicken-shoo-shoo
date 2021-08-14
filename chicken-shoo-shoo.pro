@@ -8,6 +8,7 @@ CONFIG -= app_bundle
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        audiorecorder.cpp \
         avatar.cpp \
         camera.cpp \
         chicken.cpp \
@@ -37,6 +38,7 @@ unix: DEPENDPATH += $$PWD/SFML-2.5.1-macos-clang/include
 
 HEADERS += \
     ResourcePath.hpp \
+    audiorecorder.h \
     avatar.h \
     camera.h \
     chicken.h \
