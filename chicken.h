@@ -10,9 +10,6 @@ public:
     Chicken(const Chicken& other); // copy constructor
     ~Chicken();
 
-    sf::Vector2f getVel() const;
-    void setVel(const sf::Vector2f &value);
-
     sf::RectangleShape *getShape() const override;
     bool isVisible() const override;
 

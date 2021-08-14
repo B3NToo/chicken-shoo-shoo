@@ -34,6 +34,7 @@ private:
     char getTile(int x, int y);
     void drawBackgroundTile(float x, float y);
     void drawBackgroundColTile(float x, float y);
+    void drawSpikeTile(float x, float y);
     void drawWallTile(float x, float y);
     bool checkForTileCollision(int x, int y, const Drawable* movingRect, sf::Vector2f& collisionPoint,
                                sf::Vector2f& normal, float& tCollision);
@@ -56,5 +57,7 @@ private:
     std::vector<Tile> cols; // for debugging
     TimeHandler timeHandler;
     AudioRecorder recorder;
+    bool failed;
+    void loadLevel(Level l);
 };
 

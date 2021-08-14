@@ -19,6 +19,7 @@ SOURCES += \
         levelloader.cpp \
         main.cpp \
         rectangle.cpp \
+        spikes.cpp \
         tile.cpp \
         timehandler.cpp \
         utils.cpp
@@ -48,6 +49,7 @@ HEADERS += \
     level.h \
     levelloader.h \
     rectangle.h \
+    spikes.h \
     tile.h \
     timehandler.h \
     utils.h

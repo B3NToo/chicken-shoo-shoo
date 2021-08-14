@@ -11,15 +11,6 @@ Chicken::~Chicken() {
     delete this->shape;
 }
 
-sf::Vector2f Chicken::getVel() const {
-    return vel;
-}
-
-void Chicken::setVel(const sf::Vector2f &value)
-{
-    vel = value;
-}
-
 sf::RectangleShape *Chicken::getShape() const
 {
     return shape;

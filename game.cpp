@@ -16,7 +16,7 @@ Game::Game(sf::RenderWindow *_window) : window(_window),
     this->calculateVisibleTiles();
 
     // load the first level
-    this->currentLevel = this->loader.getLevel(0);
+    this->loadLevel(this->loader.getLevel(0));
 
     // add everything that will need to be drawn to drawables
     this->addDrawable(&(this->avatar));
@@ -78,6 +78,9 @@ void Game::draw() {
                 break;
             case '#':
                 this->drawWallTile(i - decimalOffset.x, j - decimalOffset.y);
+                break;
+            case '^':
+                this->drawSpikeTile(i - decimalOffset.x, j - decimalOffset.y);
                 break;
             default:
                 break;
@@ -143,25 +146,30 @@ void Game::update() {
 
         this->cols.clear();
 
-        // move everything that needs to be moved
+        // are the avatar and all the chickens still alive?
+        if(this->failed){
+            this->loadLevel(this->currentLevel);
+        } else {
+            // move everything that needs to be moved
 
-        // avatar
-        // get acceleration vector from user inputs
-        sf::Vector2f inputDir = this->calculateInputDirection();
-        this->moveDrawable(&(this->avatar), inputDir, true);
+            // avatar
+            // get acceleration vector from user inputs
+            sf::Vector2f inputDir = this->calculateInputDirection();
+            this->moveDrawable(&(this->avatar), inputDir, true);
 
-        // chicken
-        sf::Vector2f chickenVel = this->calculateChickenDirection();
-        this->moveDrawable((&this->chicken), chickenVel, true);
+            // chicken
+            sf::Vector2f chickenVel = this->calculateChickenDirection();
+            this->moveDrawable((&this->chicken), chickenVel, true);
 
-        // set camera position to follow avatar position
-        sf::Vector2f newCamPos = this->camera.getPos();
-        newCamPos = Utils::subtractVectors(this->avatar.getPos(), newCamPos);
+            // set camera position to follow avatar position
+            sf::Vector2f newCamPos = this->camera.getPos();
+            newCamPos = Utils::subtractVectors(this->avatar.getPos(), newCamPos);
 
-        // make the camera "lazy", meaning it's trailing behind the avatar
-        newCamPos = Utils::scaleVector(newCamPos, 0.06);
-        newCamPos = Utils::addVectors(this->camera.getPos(), newCamPos);
-        this->camera.update(newCamPos);
+            // make the camera "lazy", meaning it's trailing behind the avatar
+            newCamPos = Utils::scaleVector(newCamPos, 0.06);
+            newCamPos = Utils::addVectors(this->camera.getPos(), newCamPos);
+            this->camera.update(newCamPos);
+        }
     }
 }
 
@@ -386,13 +394,26 @@ void Game::drawWallTile(float x, float y) {
     this->window->draw(tileShape);
 }
 
+void Game::drawSpikeTile(float x, float y) {
+    sf::RectangleShape tileShape(sf::Vector2f(Utils::TILE_WIDTH, Utils::TILE_HEIGHT));
+    tileShape.setPosition(x * Utils::TILE_WIDTH, y * Utils::TILE_HEIGHT);
+    tileShape.setFillColor(sf::Color(127, 127, 127));
+    this->window->draw(tileShape);
+}
+
 bool Game::checkForTileCollision(int x, int y, const Drawable *movingRect, sf::Vector2f &collisionPoint, sf::Vector2f &normal, float &tCollision) {
     char tileType = this->getTile(x,y);
     if(tileType != '.') {
-        Tile t(x, y, tileType);
-        if(Utils::movingRectangleCollidesWithRectangle(movingRect, &t, collisionPoint, normal, tCollision) && tCollision < 1.0) {
-            this->cols.push_back(t);
+        if(tileType == '^' || tileType == '<' || tileType == '>' || tileType == 'v') {
+            // hit spikes, reset level
+            this->failed = true;
             return true;
+        } else {
+            Tile t(x, y, tileType);
+            if(Utils::movingRectangleCollidesWithRectangle(movingRect, &t, collisionPoint, normal, tCollision) && tCollision < 1.0) {
+                this->cols.push_back(t);
+                return true;
+            }
         }
     }
 
@@ -404,6 +425,15 @@ sf::Vector2f Game::calculateFriction(const sf::Vector2f &vel) {
     sf::Vector2f toReturn = vel;
     Utils::scaleVector(toReturn, -0.075);
     return toReturn;
+}
+
+void Game::loadLevel(Level l) {
+    this->currentLevel = l;
+    this->avatar.setVel(0.0,0.0);
+    this->avatar.setPos(this->currentLevel.getAvatarStartingPos());
+    this->chicken.setVel(0.0,0.0);
+    this->chicken.setPos(this->currentLevel.getChickenStartingPos());
+    this->failed = false;
 }
 /****** GETTERS & SETTERS *******/
 
