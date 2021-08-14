@@ -5,7 +5,7 @@ Level::Level() {
 }
 
 Level::Level(std::string _structure, int _width, int _height) : structure(_structure), width(_width), height(_height) {
-    this->gravity = sf::Vector2f(0.0, 2.25);
+    this->gravity = sf::Vector2f(0.0, 0.05);
 }
 
 int Level::getWidth() const

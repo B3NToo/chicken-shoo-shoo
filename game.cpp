@@ -7,7 +7,7 @@ Game::Game(sf::RenderWindow *_window) : window(_window),
                                         chicken(Chicken()),
                                         loader(LevelLoader()),
                                         camera(Camera()),
-                                        clock(sf::Clock()) {
+                                        timeHandler(TimeHandler()) {
     // for debugging
     avatar.setPos(2.0, 2.0);
 
@@ -114,138 +114,153 @@ void Game::readInputs() {
     }
 }
 
-void Game::update() {
-    sf::Time elapsed = this->clock.restart();
-    this->cols.clear();
+void Game::update() {    
+    // fixed timesteps: Updating objects' accelerations, velocities and positions based on the exact elapsed time since the last frame will yield inaccurate results.
+    // Instead, we calculate how many "steps" fit into the elapsed time since last frame. The time needed for a step is 1/60 of a second, giving us 60 steps per second.
+    // If there is not enough time left for a step in this frame, the remaining time will be carried over to the next frame, and the elapsed time since this frame will be added on top.
+    // At a low framerate, this will update our data multiple times per frame, while only drawing once.
+    this->timeHandler.frame();
+    while(this->timeHandler.hasEnoughTimeForStep()) {
+        this->timeHandler.step();
 
-    // move everything that needs to be moved
-    this->moveAvatar(elapsed);
-    this->moveChicken();
+        this->cols.clear();
 
-    // check for collision
+        // move everything that needs to be moved
 
-    // collect every LevelElement the Movable passes, in the order it passes them
+        // avatar
+        // get acceleration vector from user inputs
+        sf::Vector2f inputDir = this->calculateInputDirection();
+        this->moveDrawable(&(this->avatar), inputDir, true);
+
+        // chicken
+        sf::Vector2f chickenVel = this->calculateChickenDirection();
+        this->moveDrawable((&this->chicken), chickenVel, true);
+
+        // check for collision
+
+        // collect every LevelElement the Movable passes, in the order it passes them
 
 
-    // for every collected LevelElement, if the LevelElement is not unoccupied (aka '.'),
-    // call that LevelElement's collision handling function, then break;
+        // for every collected LevelElement, if the LevelElement is not unoccupied (aka '.'),
+        // call that LevelElement's collision handling function, then break;
 
 
 
-    // set camera position to follow avatar position
-    sf::Vector2f newCamPos = this->camera.getPos();
-    newCamPos = Utils::subtractVectors(this->avatar.getPos(), newCamPos);
+        // set camera position to follow avatar position
+        sf::Vector2f newCamPos = this->camera.getPos();
+        newCamPos = Utils::subtractVectors(this->avatar.getPos(), newCamPos);
 
-    // make the camera "lazy", meaning it's trailing behind the avatar
-    newCamPos = Utils::scaleVector(newCamPos, 0.006);
-    newCamPos = Utils::addVectors(this->camera.getPos(), newCamPos);
-    this->camera.update(newCamPos);
+        // make the camera "lazy", meaning it's trailing behind the avatar
+        newCamPos = Utils::scaleVector(newCamPos, 0.06);
+        newCamPos = Utils::addVectors(this->camera.getPos(), newCamPos);
+        this->camera.update(newCamPos);
+    }
 }
 
-void Game::moveAvatar(sf::Time elapsed) {
-    // add avatar acceleration vector from user inputs
-    sf::Vector2f newVel = this->calculateInputDirection();
+void Game::moveDrawable(Drawable *d, sf::Vector2f acc, bool affectedByGravity) {
+    sf::Vector2f newVel;
 
     // add forces
-    newVel = Utils::addVectors(newVel, this->currentLevel.getGravity());
-
-    // scale it to time
-    Utils::scaleVector(newVel, elapsed.asSeconds()*0.04);
-
-    // is the avatar jumping?
-    if (this->isJumping()) {
-        newVel.y -= 0.0375;
+    // gravity
+    if(affectedByGravity) {
+        acc = Utils::addVectors(acc, this->currentLevel.getGravity());
     }
 
-    // add the element's current speed
-    newVel = Utils::addVectors(newVel, this->avatar.getVel());
+    // friction
+    sf::Vector2f friction = this->calculateFriction(d->getVel());
+    acc = Utils::addVectors(acc, friction);
 
-    // add some friction and scale it to time
-    sf::Vector2f friction = this->calculateFriction(newVel);
-    Utils::scaleVector(friction, elapsed.asSeconds());
-    newVel = Utils::addVectors(newVel, friction);
+    // the new velocity is calculated by adding the accelaration to last frame's velocity
+    newVel = (Utils::addVectors(d->getVel(), acc));
 
-    // clip speed
-    float xMaxSpeed = 0.01;
-    if (newVel.x > xMaxSpeed) {
-        newVel.x = xMaxSpeed;
-    } else if (newVel.x < -xMaxSpeed) {
-        newVel.x = -xMaxSpeed;
+    // clip velocity to a speed limit
+    float xMaxVel = 0.2;
+    if (newVel.x > xMaxVel) {
+        newVel.x = xMaxVel;
+    } else if (newVel.x < -xMaxVel) {
+        newVel.x = -xMaxVel;
     }
 
-    float yMaxSpeed = 0.5;
-    if (newVel.y > yMaxSpeed) {
-        std::cout << "hot" << std::endl;
-        newVel.y = yMaxSpeed;
-    } else if (newVel.y < -yMaxSpeed) {
-        newVel.y = -yMaxSpeed;
+    float yMaxVel = 5;
+    if (newVel.y > yMaxVel) {
+        newVel.y = yMaxVel;
+        std::cout << "ymax" << std::endl;
+    } else if (newVel.y < -yMaxVel) {
+        newVel.y = -yMaxVel;
+        std::cout << "ymax" << std::endl;
     }
 
-    this->avatar.setVel(newVel);
+    // set the object's velocity to the new velocity. If there are no collisions, nothing will be changed about this new velocity
+    // and the new position will be calculated from this
+    d->setVel(newVel);
 
-    // find the smallest rectangle still including all possible collision tiles, stretching from xMin/yMin to xMax/yMax
-    sf::Vector2f newPos = Utils::addVectors(this->avatar.getPos(), newVel);
-    float xStart = this->avatar.getPos().x;
+    // find the smallest rectangle still including all tiles the object might collide with, stretching from xMin/yMin to xMax/yMax
+    sf::Vector2f newPos = Utils::addVectors(d->getPos(), newVel);
+    float xStart = d->getPos().x;
     float xEnd = newPos.x;
-    float yStart = this->avatar.getPos().y;
+    float yStart = d->getPos().y;
     float yEnd = newPos.y;
 
+    // set up variables for collision calculation
     sf::Vector2f colP;
     sf::Vector2f normal;
     float tCol;
 
+    // collision calculation: Which tiles need to be checked, and the order of checking them depends on the drawable's velocity vector's direction
+    // x-direction is right to left
     if(xStart > xEnd) {
+        // y-direction is top to bottom
         if(yStart < yEnd) {
             for (int i = xStart + 1; i > xEnd - 1; i--) {
                 for (int j = yStart; j < yEnd + 3; j++) {
-                    if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
+                    if (this->checkForTileCollision(i, j, d, colP, normal, tCol)) {
                         newVel.x += normal.x * std::abs(newVel.x) * (1 - tCol);
                         newVel.y += normal.y * std::abs(newVel.y) * (1 - tCol);
-                        this->avatar.setVel(newVel);
+                        d->setVel(newVel);
                     }
                 }
             }
         } else {
+            // y-direction is bottom to top or no y-velocity
             for (int i = xStart + 1; i > xEnd - 1; i--) {
                 for (int j = yStart + 1; j > yEnd - 1; j--) {
-                    if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
+                    if (this->checkForTileCollision(i, j, d, colP, normal, tCol)) {
                         newVel.x += normal.x * std::abs(newVel.x) * (1 - tCol);
                         newVel.y += normal.y * std::abs(newVel.y) * (1 - tCol);
-                        this->avatar.setVel(newVel);
+                        d->setVel(newVel);
                     }
                 }
             }
         }
     } else {
+        // x-direction is left to right or no x-velocity
+        // y-direction is top to bottom
         if(yStart < yEnd) {
-
             for (int i = xStart; i < xEnd + 3; i++) {
                 for (int j = yStart; j < yEnd + 3; j++) {
-
-                    if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
+                    if (this->checkForTileCollision(i, j, d, colP, normal, tCol)) {
                         newVel.x += normal.x * std::abs(newVel.x) * (1 - tCol);
                         newVel.y += normal.y * std::abs(newVel.y) * (1 - tCol);
-                        this->avatar.setVel(newVel);
+                        d->setVel(newVel);
                     }
                 }
             }
         } else {
+            // y-direction is bottom to top or no y-velocity
             for (int i = xStart ; i < xEnd + 3; i++) {
                 for (int j = yStart + 1; j > yEnd - 1; j--) {
-                    if (this->checkForTileCollision(i, j, &(this->avatar), colP, normal, tCol)) {
+                    if (this->checkForTileCollision(i, j, d, colP, normal, tCol)) {
                         newVel.x += normal.x * std::abs(newVel.x) * (1 - tCol);
                         newVel.y += normal.y * std::abs(newVel.y) * (1 - tCol);
-                        this->avatar.setVel(newVel);
+                        d->setVel(newVel);
                     }
                 }
             }
         }
     }
 
-    // might have to reverse some ordering here, depending on the velocity vector's direction
-    // lots of room for performance improvement here
-
-    this->avatar.setPos(Utils::addVectors(this->avatar.getPos(), this->avatar.getVel()));
+    // update object's position
+    d->setPos(Utils::addVectors(d->getPos(), d->getVel()));
 }
 
 void Game::moveChicken() {
@@ -259,7 +274,7 @@ void Game::moveChicken() {
     // distance between chicken and avatar
     float distance = sqrt((chX - avX) * (chX - avX) + (chY - avY) * (chY - avY));
 
-    if (distance < 1.0f) {
+    if (distance < 2.0f) {
         // checks if avatar is right or left from chicken
         if ((chX - avX) > 0) {
             // right
@@ -269,6 +284,32 @@ void Game::moveChicken() {
             this->chicken.setPos((chX - 1.0f), chY);
         }
     }
+}
+
+sf::Vector2f Game::calculateChickenDirection() {
+    sf::Vector2f newVel;
+
+    float avX = this->avatar.getPos().x;
+    float avY = this->avatar.getPos().y;
+
+    float chX = this->chicken.getPos().x;
+    float chY = this->chicken.getPos().y;
+
+    // distance between chicken and avatar
+    float distance = sqrt((chX - avX) * (chX - avX) + (chY - avY) * (chY - avY));
+
+    if (distance < 2.0f) {
+        // checks if avatar is right or left from chicken
+        if ((chX - avX) > 0) {
+            // right
+            newVel.x += 0.3;
+        } else {
+            // left
+            newVel.x -= 0.3;
+        }
+    }
+
+    return newVel;
 }
 
 void Game::addDrawable(Drawable *d) {
@@ -281,25 +322,20 @@ sf::Vector2f Game::calculateInputDirection() {
 
     // left and right always influence the movement
     if(this->inputs.getKeyStates().at(this->inputs.left)) {
-        direction.x--;
+        direction.x -= 0.01;
     }
 
     if(this->inputs.getKeyStates().at(this->inputs.right)) {
-        direction.x++;
+        direction.x += 0.01;
     }
 
-    return direction;
-}
-
-bool Game::isJumping() {
-    // if the jump key is pressed, check if the avatar is on the ground
     if(this->inputs.getKeyStates().at(this->inputs.jump)) {
         if (this->isTouchingGround(&(this->avatar))) {
-            return true;
+            direction.y -= 0.8;
         }
     }
 
-    return false;
+    return direction;
 }
 
 // check if the drawable element's bottom is touching a ground tile
@@ -373,7 +409,7 @@ bool Game::checkForTileCollision(int x, int y, const Drawable *movingRect, sf::V
 sf::Vector2f Game::calculateFriction(const sf::Vector2f &vel) {
     // friction is a small vector pointing in the opposite direction of the object's velocity
     sf::Vector2f toReturn = vel;
-    Utils::scaleVector(toReturn, -0.005);
+    Utils::scaleVector(toReturn, -0.075);
     return toReturn;
 }
 /****** GETTERS & SETTERS *******/

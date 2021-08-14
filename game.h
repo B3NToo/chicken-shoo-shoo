@@ -14,6 +14,7 @@
 #include "levelloader.h"
 #include <math.h>
 #include "tile.h"
+#include "timehandler.h"
 
 
 class Game {
@@ -26,7 +27,6 @@ public:
     void addDrawable(Drawable *d);
     sf::Vector2f calculateInputDirection();
 private:
-    void moveAvatar(sf::Time elapsed);
     void moveChicken();
     bool isTouchingGround(Drawable* d); // this should probably be Movable, but Movable is not implemented yet
     void calculateVisibleTiles();
@@ -36,8 +36,9 @@ private:
     void drawWallTile(float x, float y);
     bool checkForTileCollision(int x, int y, const Drawable* movingRect, sf::Vector2f& collisionPoint,
                                sf::Vector2f& normal, float& tCollision);
-    bool isJumping();
     sf::Vector2f calculateFriction(const sf::Vector2f &vel);
+    void moveDrawable(Drawable* d, sf::Vector2f acc, bool affectedByGravity);
+    sf::Vector2f calculateChickenDirection();
 public:
 
 private:
@@ -52,6 +53,8 @@ private:
     int visibleTilesX; // amount of tiles that fit inside the screen in a single row
     int visibleTilesY; // amount of tiles that fit inside the screen in a single column
     std::vector<Tile> cols; // for debugging
-    sf::Clock clock;
+    float lastFrameMaxY;
+    bool maxYReached;
+    TimeHandler timeHandler;
 };
 

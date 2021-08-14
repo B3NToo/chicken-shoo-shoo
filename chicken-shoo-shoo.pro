@@ -19,6 +19,7 @@ SOURCES += \
         main.cpp \
         rectangle.cpp \
         tile.cpp \
+        timehandler.cpp \
         utils.cpp
 
 # Default rules for deployment.
@@ -46,4 +47,5 @@ HEADERS += \
     levelloader.h \
     rectangle.h \
     tile.h \
+    timehandler.h \
     utils.h
