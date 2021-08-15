@@ -288,20 +288,24 @@ sf::Vector2f Game::calculateChickenDirection() {
     float chX = this->chicken.getPos().x;
     float chY = this->chicken.getPos().y;
 
+    // this whole thing probably shouldn't take the actual distance, but just the x distance, after checking if a certain y-threshold is met
     // distance between chicken and avatar
     float distance = sqrt((chX - avX) * (chX - avX) + (chY - avY) * (chY - avY));
 
-    if (distance < 2.0f) {
+    // the distance at which the chicken starts reacting to the avatar
+    float minDistance = 2.0;
+
+    if (distance < minDistance) {
         // checks if avatar is right or left from chicken
-        if ((chX - avX) > 0) {
+        if ((chX - avX) > 0.0) {
             // right
-            newVel.x += 0.3;
-        } else if ((chX - avX == 0)) {
+            newVel.x += (1 - (distance / minDistance)) * 0.3;
+        } else if ((chX - avX == 0.0)) {
             // standing on top of each other
-            newVel.x += (rand() % 3 - 1) * 0.3;
+            newVel.x += (rand() % 3 - 1) * (1 - (distance / minDistance)) * 0.3;
         } else {
             // left
-            newVel.x -= 0.3;
+            newVel.x -= (1 - (distance / minDistance)) * 0.3;
         }
     }
 
