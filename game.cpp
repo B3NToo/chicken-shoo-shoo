@@ -296,6 +296,9 @@ sf::Vector2f Game::calculateChickenDirection() {
         if ((chX - avX) > 0) {
             // right
             newVel.x += 0.3;
+        } else if ((chX - avX == 0)) {
+            // standing on top of each other
+            newVel.x += (rand() % 3 - 1) * 0.3;
         } else {
             // left
             newVel.x -= 0.3;
