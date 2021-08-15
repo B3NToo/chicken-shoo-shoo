@@ -310,7 +310,7 @@ sf::Vector2f Game::calculateChickenDirection() {
     }
 
     // is the chicken being shooed? Check if the microphone input is above a threshold
-    if (this->recorder.getVolume() > 1000) {
+    if (this->recorder.getVolume() > 1500) {
         if(this->isTouchingGround(&(this->chicken))) {
             std::cout << "shoo" << std::endl;
             newVel.y -= 0.7;
