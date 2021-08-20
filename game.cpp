@@ -8,7 +8,9 @@ Game::Game(sf::RenderWindow *_window) : window(_window),
                                         loader(LevelLoader()),
                                         camera(Camera()),
                                         timeHandler(TimeHandler()),
-                                        recorder(AudioRecorder()) {
+                                        recorder(AudioRecorder()),
+                                        dead(false),
+                                        levelPassed(false) {
     // for debugging
     avatar.setPos(2.0, 2.0);
 
@@ -82,6 +84,9 @@ void Game::draw() {
             case '^':
                 this->drawSpikeTile(i - decimalOffset.x, j - decimalOffset.y);
                 break;
+            case '*':
+                this->drawGoalTile(i - decimalOffset.x, j - decimalOffset.y);
+                break;
             default:
                 break;
             }
@@ -147,7 +152,7 @@ void Game::update() {
         this->cols.clear();
 
         // are the avatar and all the chickens still alive?
-        if(this->failed){
+        if(this->dead){
             this->loadLevel(this->currentLevel);
         } else {
             // move everything that needs to be moved
@@ -293,7 +298,7 @@ sf::Vector2f Game::calculateChickenDirection() {
     float distance = sqrt((chX - avX) * (chX - avX) + (chY - avY) * (chY - avY));
 
     // the distance at which the chicken starts reacting to the avatar
-    float minDistance = 2.0;
+    float minDistance = 3.0;
 
     if (distance < minDistance) {
         // checks if avatar is right or left from chicken
@@ -408,20 +413,31 @@ void Game::drawSpikeTile(float x, float y) {
     this->window->draw(tileShape);
 }
 
+void Game::drawGoalTile(float x, float y) {
+    sf::RectangleShape tileShape(sf::Vector2f(Utils::TILE_WIDTH, Utils::TILE_HEIGHT));
+    tileShape.setPosition(x * Utils::TILE_WIDTH, y * Utils::TILE_HEIGHT);
+    tileShape.setFillColor(sf::Color(255, 215, 0));
+    this->window->draw(tileShape);
+}
+
 bool Game::checkForTileCollision(int x, int y, const Drawable *movingRect, sf::Vector2f &collisionPoint, sf::Vector2f &normal, float &tCollision) {
     char tileType = this->getTile(x,y);
     if(tileType != '.') {
-        if(tileType == '^' || tileType == '<' || tileType == '>' || tileType == 'v') {
-            // hit spikes, reset level
-            this->failed = true;
-            return true;
-        } else {
-            Tile t(x, y, tileType);
-            if(Utils::movingRectangleCollidesWithRectangle(movingRect, &t, collisionPoint, normal, tCollision) && tCollision < 1.0) {
-                this->cols.push_back(t);
-                return true;
+        Tile t(x, y, tileType);
+        if(Utils::movingRectangleCollidesWithRectangle(movingRect, &t, collisionPoint, normal, tCollision) && tCollision < 1.0) {
+            this->cols.push_back(t);
+
+            if(tileType == '^' || tileType == '<' || tileType == '>' || tileType == 'v') {
+                // hit spikes, reset level
+                this->dead = true;
+            } else if(tileType == '*' && movingRect == &(this->chicken)) {
+                // reached goal, load next level
+                std::cout << "level passed" << std::endl;
+                this->levelPassed = true;
             }
+            return true;
         }
+
     }
 
     return false;
@@ -440,7 +456,7 @@ void Game::loadLevel(Level l) {
     this->avatar.setPos(this->currentLevel.getAvatarStartingPos());
     this->chicken.setVel(0.0,0.0);
     this->chicken.setPos(this->currentLevel.getChickenStartingPos());
-    this->failed = false;
+    this->dead = false;
 }
 /****** GETTERS & SETTERS *******/
 
