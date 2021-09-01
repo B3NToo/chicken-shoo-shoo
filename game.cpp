@@ -18,7 +18,7 @@ Game::Game(sf::RenderWindow *_window) : window(_window),
     this->calculateVisibleTiles();
 
     // load the first level
-    this->loadLevel(this->loader.getLevel(0));
+    this->loadLevel(this->loader.getLevel(1));
 
     // add everything that will need to be drawn to drawables
     this->addDrawable(&(this->avatar));
@@ -108,9 +108,9 @@ void Game::draw() {
         }
     }
 
-    for (std::vector<Tile>::iterator i = this->cols.begin(); i != this->cols.end(); ++i) {
-        this->drawBackgroundColTile(i->getPos().x - topLeft.x, i->getPos().y - topLeft.y);
-    }
+//    for (std::vector<Tile>::iterator i = this->cols.begin(); i != this->cols.end(); ++i) {
+//        this->drawBackgroundColTile(i->getPos().x - topLeft.x, i->getPos().y - topLeft.y);
+//    }
 }
 
 // handles all events that occured since the last call to readInputs()
@@ -149,7 +149,7 @@ void Game::update() {
     while(this->timeHandler.hasEnoughTimeForStep()) {
         this->timeHandler.step();
 
-        this->cols.clear();
+        //this->cols.clear();
 
         // are the avatar and all the chickens still alive?
         if(this->dead){
@@ -425,7 +425,7 @@ bool Game::checkForTileCollision(int x, int y, const Drawable *movingRect, sf::V
     if(tileType != '.') {
         Tile t(x, y, tileType);
         if(Utils::movingRectangleCollidesWithRectangle(movingRect, &t, collisionPoint, normal, tCollision) && tCollision < 1.0) {
-            this->cols.push_back(t);
+            //this->cols.push_back(t);
 
             if(tileType == '^' || tileType == '<' || tileType == '>' || tileType == 'v') {
                 // hit spikes, reset level
