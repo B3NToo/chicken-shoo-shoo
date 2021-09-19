@@ -10,6 +10,7 @@ CONFIG -= app_bundle
 SOURCES += \
         audiorecorder.cpp \
         avatar.cpp \
+        button.cpp \
         camera.cpp \
         chicken.cpp \
         drawable.cpp \
@@ -18,6 +19,7 @@ SOURCES += \
         level.cpp \
         levelloader.cpp \
         main.cpp \
+        menu.cpp \
         rectangle.cpp \
         spikes.cpp \
         tile.cpp \
@@ -38,9 +40,9 @@ unix: INCLUDEPATH += $$PWD/SFML-2.5.1-macos-clang/include
 unix: DEPENDPATH += $$PWD/SFML-2.5.1-macos-clang/include
 
 HEADERS += \
-    ResourcePath.hpp \
     audiorecorder.h \
     avatar.h \
+    button.h \
     camera.h \
     chicken.h \
     drawable.h \
@@ -48,6 +50,7 @@ HEADERS += \
     inputhandler.h \
     level.h \
     levelloader.h \
+    menu.h \
     rectangle.h \
     spikes.h \
     tile.h \

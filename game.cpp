@@ -10,7 +10,9 @@ Game::Game(sf::RenderWindow *_window) : window(_window),
                                         timeHandler(TimeHandler()),
                                         recorder(AudioRecorder()),
                                         dead(false),
-                                        levelPassed(false) {
+                                        levelPassed(false),
+                                        settings(std::map<std::string, int>()),
+                                        menu(Menu(window)) {
     // for debugging
     avatar.setPos(2.0, 2.0);
 
@@ -108,36 +110,30 @@ void Game::draw() {
         }
     }
 
-//    for (std::vector<Tile>::iterator i = this->cols.begin(); i != this->cols.end(); ++i) {
-//        this->drawBackgroundColTile(i->getPos().x - topLeft.x, i->getPos().y - topLeft.y);
-//    }
+    // draw menu if it needs to be displayed
+    if (this->menu.isVisible()) {
+        this->menu.display();
+    }
 }
 
 // handles all events that occured since the last call to readInputs()
-void Game::readInputs() {
-    sf::Event event;
-    while (window->pollEvent(event)) {
-        // check the type of the event...
-        switch (event.type) {
-            // window closed
-        case sf::Event::Closed:
-            window->close();
-            break;
+void Game::handleInput(sf::Event event) {
+    // check the type of the event...
+    switch (event.type) {
+        // key pressed
+    case (sf::Event::KeyPressed):
+        this->inputs.handleKeyEvent(event);
+        break;
 
-            // key pressed
-        case (sf::Event::KeyPressed):
-            this->inputs.handleKeyEvent(event);
-            break;
+    case (sf::Event::KeyReleased):
+        this->inputs.handleKeyEvent(event);
+        break;
 
-        case (sf::Event::KeyReleased):
-            this->inputs.handleKeyEvent(event);
-            break;
-
-            // we don't process other types of events yet
-        default:
-            break;
-        }
+        // we don't process other types of events yet
+    default:
+        break;
     }
+
 }
 
 void Game::update() {    
@@ -149,7 +145,7 @@ void Game::update() {
     while(this->timeHandler.hasEnoughTimeForStep()) {
         this->timeHandler.step();
 
-        //this->cols.clear();
+        //this->cols.clear(); // debugging
 
         // are the avatar and all the chickens still alive?
         if(this->dead){
@@ -182,6 +178,7 @@ void Game::moveDrawable(Drawable *d, sf::Vector2f acc, bool affectedByGravity) {
     sf::Vector2f newVel;
 
     // add forces
+
     // gravity
     if(affectedByGravity) {
         acc = Utils::addVectors(acc, this->currentLevel.getGravity());
@@ -194,7 +191,7 @@ void Game::moveDrawable(Drawable *d, sf::Vector2f acc, bool affectedByGravity) {
     // the new velocity is calculated by adding the accelaration to last frame's velocity
     newVel = (Utils::addVectors(d->getVel(), acc));
 
-    // clip velocity to a speed limit
+    // clip new velocity to a speed limit
     float xMaxVel = 0.2;
     if (newVel.x > xMaxVel) {
         newVel.x = xMaxVel;
@@ -212,17 +209,18 @@ void Game::moveDrawable(Drawable *d, sf::Vector2f acc, bool affectedByGravity) {
     }
 
     // set the object's velocity to the new velocity. If there are no collisions, nothing will be changed about this new velocity
-    // and the new position will be calculated from this
+    // and the new position will be calculated based on this
     d->setVel(newVel);
 
-    // find the smallest rectangle still including all tiles the object might collide with, stretching from xMin/yMin to xMax/yMax
+    // find all tiles the object might collide with this frame
+    // find the smallest rectangle still including all tiles the object might collide with, stretching from xStart/yStart to xEnd/yEnd
     sf::Vector2f newPos = Utils::addVectors(d->getPos(), newVel);
     float xStart = d->getPos().x;
     float xEnd = newPos.x;
     float yStart = d->getPos().y;
     float yEnd = newPos.y;
 
-    // set up variables for collision calculation
+    // these variables are needed for our collision calculation function:
     sf::Vector2f colP;
     sf::Vector2f normal;
     float tCol;
@@ -293,7 +291,7 @@ sf::Vector2f Game::calculateChickenDirection() {
     float chX = this->chicken.getPos().x;
     float chY = this->chicken.getPos().y;
 
-    // this whole thing probably shouldn't take the actual distance, but just the x distance, after checking if a certain y-threshold is met
+    // note: this whole thing probably shouldn't take the actual distance, but just the x distance, after checking if a certain y-threshold is met
     // distance between chicken and avatar
     float distance = sqrt((chX - avX) * (chX - avX) + (chY - avY) * (chY - avY));
 
@@ -307,6 +305,7 @@ sf::Vector2f Game::calculateChickenDirection() {
             newVel.x += (1 - (distance / minDistance)) * 0.3;
         } else if ((chX - avX == 0.0)) {
             // standing on top of each other
+            // give the chicken a random direction
             newVel.x += (rand() % 3 - 1) * (1 - (distance / minDistance)) * 0.3;
         } else {
             // left

@@ -3,8 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 // interface that makes the class drawable by ensuring it has a drawable shape
-class Drawable
-{
+class Drawable {
 public:
     Drawable();
 

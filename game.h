@@ -17,12 +17,12 @@
 #include "timehandler.h"
 #include <SFML/Audio.hpp>
 #include "audiorecorder.h"
-
+#include "menu.h"
 
 class Game {
 public:
     Game(sf::RenderWindow* window);
-	void readInputs();
+    void handleInput(sf::Event event);
 	void update();
 	void draw();
     sf::RenderWindow *getWindow() const;
@@ -61,5 +61,7 @@ private:
     bool dead;
     bool levelPassed;
     void loadLevel(Level l);
+    std::map<std::string, int> settings;
+    Menu menu;
 };
 
